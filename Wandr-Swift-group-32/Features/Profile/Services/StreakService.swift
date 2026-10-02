@@ -13,12 +13,14 @@ class StreakService {
             return StreakDTO.mock
         }
 
-        if supabase.auth.currentSession == nil {
-            try await supabase.auth.signIn(
-                email: "valentina.gomez@example.com",
-                password: "password123"
-            )
-        }
+        //        if supabase.auth.currentSession == nil {
+        //  try await supabase.auth.signIn(
+        //      email: "valentina.gomez@example.com",
+        //      password: "password123"
+        //  )
+        //}
+        
+        try await signInTestUserIfNeeded()
 
         
         let response = try await supabase
