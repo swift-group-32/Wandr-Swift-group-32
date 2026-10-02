@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ActiveQuestView: View {
     @StateObject private var viewModel = ActiveQuestViewModel()
+    @Environment(\.openURL) private var openURL
+    @State private var showGiveUpConfirm = false
 
     var body: some View {
         NavigationStack {
@@ -35,6 +37,21 @@ struct ActiveQuestView: View {
             .background(Color.wandrCream)
             .navigationTitle("Active Quest")
             .navigationBarTitleDisplayMode(.inline)
+            .confirmationDialog("Give up this quest?", isPresented: $showGiveUpConfirm, titleVisibility: .visible) {
+                Button("Give up", role: .destructive) {
+                    Task { await viewModel.giveUp() }
+                }
+            } message: {
+                Text("Your progress on this quest will be lost.")
+            }
+            .alert("Something went wrong", isPresented: Binding(
+                get: { viewModel.actionError != nil },
+                set: { if !$0 { viewModel.actionError = nil } }
+            )) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(viewModel.actionError ?? "")
+            }
         }
         .task {
             await viewModel.loadActiveQuest()
@@ -94,7 +111,9 @@ struct ActiveQuestView: View {
             }
 
             Button {
-                // TODO: phase 3, open Apple Maps
+                if let url = viewModel.navigationURL {
+                    openURL(url)
+                }
             } label: {
                 Label("Navigate", systemImage: "location.fill")
                     .frame(maxWidth: .infinity)
@@ -106,7 +125,7 @@ struct ActiveQuestView: View {
         }
         .cardStyle()
     }
-
+    
     func objectivesSection() -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -119,7 +138,13 @@ struct ActiveQuestView: View {
             }
 
             ForEach(viewModel.objectives) { objective in
-                objectiveRow(objective)
+                Button {
+                    Task { await viewModel.checkObjective(objective) }
+                } label: {
+                    objectiveRow(objective)
+                }
+                .buttonStyle(.plain)
+                .disabled(viewModel.isWorking)
             }
         }
     }
@@ -161,18 +186,19 @@ struct ActiveQuestView: View {
         }
     }
 
-    func giveUpButton() -> some View {
-        Button {
-            // TODO: phase 3, call abandon_quest
-        } label: {
-            Label("Give up quest", systemImage: "flag")
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.red.opacity(0.1))
-                .foregroundColor(.red)
-                .cornerRadius(12)
+        func giveUpButton() -> some View {
+            Button {
+                showGiveUpConfirm = true
+            } label: {
+                Label("Give up quest", systemImage: "flag")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.red.opacity(0.1))
+                    .foregroundColor(.red)
+                    .cornerRadius(12)
+            }
+            .disabled(viewModel.isWorking)
         }
-    }
 }
 
 #Preview {

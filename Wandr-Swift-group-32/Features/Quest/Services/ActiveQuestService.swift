@@ -40,4 +40,23 @@ class ActiveQuestService {
 
         return results.first
     }
+    
+    func completeObjective(questId: String, objectiveId: String) async throws {
+        if useMockData { return }
+
+        try await supabase
+            .rpc("complete_objective", params: [
+                "p_quest_id": questId,
+                "p_objective_id": objectiveId
+            ])
+            .execute()
+    }
+
+    func abandonQuest(questId: String) async throws {
+        if useMockData { return }
+
+        try await supabase
+            .rpc("abandon_quest", params: ["p_quest_id": questId])
+            .execute()
+    }
 }
