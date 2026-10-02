@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B41DE8EA306F3ACA00C4B63D /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = B41DE8E9306F3ACA00C4B63D /* Supabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		02880E673067DAB100FD93F4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -46,6 +50,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B41DE8EA306F3ACA00C4B63D /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -113,6 +118,7 @@
 			);
 			name = "Wandr-Swift-group-32";
 			packageProductDependencies = (
+				B41DE8E9306F3ACA00C4B63D /* Supabase */,
 			);
 			productName = "Wandr-Swift-group-32";
 			productReference = 02F6ECEF3066092E00D705AF /* Wandr-Swift-group-32.app */;
@@ -146,6 +152,9 @@
 			);
 			mainGroup = 02F6ECE63066092E00D705AF;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B41DE8E8306F3ACA00C4B63D /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 02F6ECF03066092E00D705AF /* Products */;
 			projectDirPath = "";
@@ -474,6 +483,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B41DE8E8306F3ACA00C4B63D /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B41DE8E9306F3ACA00C4B63D /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B41DE8E8306F3ACA00C4B63D /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 02F6ECE73066092E00D705AF /* Project object */;
 }
