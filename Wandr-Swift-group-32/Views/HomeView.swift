@@ -8,7 +8,7 @@ struct HomeView: View {
 
 
 
-    @State private var selectedTab: AppTab = .home
+    @Binding var selectedTab: AppTab
 
     @State private var savedQuestIds: Set<String> = []
 
@@ -129,6 +129,9 @@ struct HomeView: View {
                     title: "Mystery Quest",
                     icon: "sparkles"
                 )
+                
+            case .quest:
+                ActiveQuestView()
 
             }
 
@@ -1444,17 +1447,6 @@ struct HomeView: View {
             )
 
 
-
-            // MARK: Bottom Navigation
-
-
-
-            BottomNavigationBar(
-
-                selectedTab: $selectedTab
-
-            )
-
         }
 
         .background(
@@ -1737,12 +1729,6 @@ struct HomeView: View {
 
 
 
-                BottomNavigationBar(
-
-                    selectedTab: $selectedTab
-
-                )
-
             }
 
         )
@@ -1927,6 +1913,8 @@ struct RecommendedQuestCard: View {
 
 #Preview {
 
-    HomeView()
+    HomeView(
+            selectedTab: .constant(.home)
+        )
 
 }

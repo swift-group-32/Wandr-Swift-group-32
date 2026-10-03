@@ -377,9 +377,7 @@ struct RecommendedQuestsView: View {
                 }
             }
 
-            BottomNavigationBar(
-                selectedTab: $selectedTab
-            )
+        
         }
         .background(
             Color("WandrBackground")

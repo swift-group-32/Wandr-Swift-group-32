@@ -645,9 +645,6 @@ struct ExploreView: View {
                 Color("WandrBackground")
             )
 
-            BottomNavigationBar(
-                selectedTab: $selectedTab
-            )
         }
         .background(
             Color("WandrBackground")

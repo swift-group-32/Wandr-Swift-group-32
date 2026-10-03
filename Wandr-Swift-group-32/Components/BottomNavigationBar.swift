@@ -6,6 +6,7 @@ enum AppTab {
     case map
     case saved
     case profile
+    case quest
     case mysteryQuest
 }
 
