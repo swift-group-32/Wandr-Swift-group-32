@@ -1,9 +1,13 @@
 import SwiftUI
+import PhotosUI
 
 struct ActiveQuestView: View {
     @StateObject private var viewModel = ActiveQuestViewModel()
     @Environment(\.openURL) private var openURL
     @State private var showGiveUpConfirm = false
+    @State private var showPhotoPicker = false
+    @State private var selectedPhoto: PhotosPickerItem? = nil
+    @State private var photoObjective: QuestObjective? = nil
 
     var body: some View {
         NavigationStack {
@@ -37,6 +41,7 @@ struct ActiveQuestView: View {
             .background(Color.wandrCream)
             .navigationTitle("Active Quest")
             .navigationBarTitleDisplayMode(.inline)
+            // Asks before giving up the quest
             .confirmationDialog("Give up this quest?", isPresented: $showGiveUpConfirm, titleVisibility: .visible) {
                 Button("Give up", role: .destructive) {
                     Task { await viewModel.giveUp() }
@@ -44,6 +49,7 @@ struct ActiveQuestView: View {
             } message: {
                 Text("Your progress on this quest will be lost.")
             }
+            // Shown when an action fails
             .alert("Something went wrong", isPresented: Binding(
                 get: { viewModel.actionError != nil },
                 set: { if !$0 { viewModel.actionError = nil } }
@@ -51,6 +57,25 @@ struct ActiveQuestView: View {
                 Button("OK", role: .cancel) { }
             } message: {
                 Text(viewModel.actionError ?? "")
+            }
+            // CHANGE C: shown when the whole quest is completed
+            .alert("Quest completed! 🎉", isPresented: Binding(
+                get: { viewModel.completionMessage != nil },
+                set: { if !$0 { viewModel.completionMessage = nil } }
+            )) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(viewModel.completionMessage ?? "")
+            }
+            .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhoto, matching: .images)
+            .onChange(of: selectedPhoto) { _, newItem in
+                guard let newItem = newItem, let objective = photoObjective else { return }
+                Task {
+                    if let data = try? await newItem.loadTransferable(type: Data.self) {
+                        await viewModel.submitPhoto(for: objective, imageData: data)
+                    }
+                    selectedPhoto = nil
+                }
             }
         }
         .task {
@@ -125,7 +150,7 @@ struct ActiveQuestView: View {
         }
         .cardStyle()
     }
-    
+
     func objectivesSection() -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -139,7 +164,13 @@ struct ActiveQuestView: View {
 
             ForEach(viewModel.objectives) { objective in
                 Button {
-                    Task { await viewModel.checkObjective(objective) }
+                    if objective.requiresPhoto {
+                        guard !viewModel.isChecked(objective) else { return }
+                        photoObjective = objective
+                        showPhotoPicker = true
+                    } else {
+                        Task { await viewModel.checkObjective(objective) }
+                    }
                 } label: {
                     objectiveRow(objective)
                 }
@@ -186,19 +217,19 @@ struct ActiveQuestView: View {
         }
     }
 
-        func giveUpButton() -> some View {
-            Button {
-                showGiveUpConfirm = true
-            } label: {
-                Label("Give up quest", systemImage: "flag")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.red.opacity(0.1))
-                    .foregroundColor(.red)
-                    .cornerRadius(12)
-            }
-            .disabled(viewModel.isWorking)
+    func giveUpButton() -> some View {
+        Button {
+            showGiveUpConfirm = true
+        } label: {
+            Label("Give up quest", systemImage: "flag")
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.red.opacity(0.1))
+                .foregroundColor(.red)
+                .cornerRadius(12)
         }
+        .disabled(viewModel.isWorking)
+    }
 }
 
 #Preview {

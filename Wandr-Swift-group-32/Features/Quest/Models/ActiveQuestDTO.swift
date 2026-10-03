@@ -34,6 +34,7 @@ struct CheckedObjective: Codable {
 
 // Mock data 
 extension ActiveQuestDTO {
+    
     static let mock = ActiveQuestDTO(
         id: "c1",
         questId: "q1",
@@ -56,5 +57,11 @@ extension ActiveQuestDTO {
             CheckedObjective(objectiveId: "o1"),
             CheckedObjective(objectiveId: "o2")
         ]
+        
     )
+}
+
+struct ObjectiveResult: Codable {
+let questCompleted: Bool
+let xpEarned: Int
 }

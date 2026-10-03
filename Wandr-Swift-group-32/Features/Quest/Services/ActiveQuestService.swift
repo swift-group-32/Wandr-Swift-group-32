@@ -1,6 +1,6 @@
 import Foundation
 import Supabase
-
+import UIKit
 
 class ActiveQuestService {
 
@@ -41,15 +41,39 @@ class ActiveQuestService {
         return results.first
     }
     
-    func completeObjective(questId: String, objectiveId: String) async throws {
-        if useMockData { return }
+    func completeObjective(questId: String, objectiveId: String, photoPath: String?) async throws -> ObjectiveResult {
+        if useMockData {
+            return ObjectiveResult(questCompleted: false, xpEarned: 0)
+        }
 
-        try await supabase
+        let response = try await supabase
             .rpc("complete_objective", params: [
                 "p_quest_id": questId,
-                "p_objective_id": objectiveId
+                "p_objective_id": objectiveId,
+                "p_photo_url": photoPath
             ])
             .execute()
+
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return try decoder.decode(ObjectiveResult.self, from: response.data)
+    }
+
+
+    func uploadProofPhoto(questId: String, objectiveId: String, imageData: Data) async throws -> String {
+        if useMockData { return "mock.jpg" }
+
+        let userId = try await supabase.auth.session.user.id
+
+        let path = "\(userId.uuidString.lowercased())/\(questId)/\(objectiveId).jpg"
+
+        let jpeg = UIImage(data: imageData)?.jpegData(compressionQuality: 0.7) ?? imageData
+
+        try await supabase.storage
+            .from("quest-photos")
+            .upload(path, data: jpeg, options: FileOptions(contentType: "image/jpeg", upsert: true))
+
+        return path
     }
 
     func abandonQuest(questId: String) async throws {

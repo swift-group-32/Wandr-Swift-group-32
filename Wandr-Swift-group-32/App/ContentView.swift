@@ -4,8 +4,18 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        //ProfileView(userId: "123")
-        ActiveQuestView()
+        TabView {
+            ActiveQuestView()
+                .tabItem {
+                    Label("Quest", systemImage: "flag")
+                }
+
+            ProfileView(userId: "123")
+                .tabItem {
+                    Label("Profile", systemImage: "person")
+                }
+        }
+        .tint(.wandrGreen)
     }
 }
 

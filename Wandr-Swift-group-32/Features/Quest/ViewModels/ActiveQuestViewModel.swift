@@ -10,6 +10,7 @@ class ActiveQuestViewModel: ObservableObject {
 
     @Published var isWorking = false
     @Published var actionError: String? = nil
+    @Published var completionMessage: String? = nil
 
     private let service = ActiveQuestService()
 
@@ -28,22 +29,50 @@ class ActiveQuestViewModel: ObservableObject {
     }
 
     func checkObjective(_ objective: QuestObjective) async {
-        guard let activeQuest = activeQuest,
-              !isChecked(objective),
-              !objective.requiresPhoto else { return }
+        guard !isChecked(objective), !objective.requiresPhoto else { return }
 
         isWorking = true
         do {
-            try await service.completeObjective(
-                questId: activeQuest.questId,
-                objectiveId: objective.id
-            )
-            await loadActiveQuest(showLoading: false)
+            try await complete(objective, photoPath: nil)
         } catch {
             print("Check objective error:", error)
             actionError = "Could not check this step. Try again."
         }
         isWorking = false
+    }
+
+    func submitPhoto(for objective: QuestObjective, imageData: Data) async {
+        guard let activeQuest = activeQuest, !isChecked(objective) else { return }
+
+        isWorking = true
+        do {
+            let path = try await service.uploadProofPhoto(
+                questId: activeQuest.questId,
+                objectiveId: objective.id,
+                imageData: imageData
+            )
+            try await complete(objective, photoPath: path)
+        } catch {
+            print("Submit photo error:", error)
+            actionError = "Could not upload the photo. Try again."
+        }
+        isWorking = false
+    }
+
+    private func complete(_ objective: QuestObjective, photoPath: String?) async throws {
+        guard let activeQuest = activeQuest else { return }
+
+        let result = try await service.completeObjective(
+            questId: activeQuest.questId,
+            objectiveId: objective.id,
+            photoPath: photoPath
+        )
+
+        if result.questCompleted {
+            completionMessage = "You earned \(result.xpEarned) XP. Great job!"
+        }
+
+        await loadActiveQuest(showLoading: false)
     }
 
     func giveUp() async {
