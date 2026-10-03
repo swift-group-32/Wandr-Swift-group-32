@@ -25,17 +25,7 @@ struct ActiveQuestView: View {
                 } else if let activeQuest = viewModel.activeQuest {
                     content(activeQuest)
                 } else {
-                    VStack(spacing: 8) {
-                        Image(systemName: "map")
-                            .font(.largeTitle)
-                            .foregroundColor(.wandrSage)
-                        Text("No active quest")
-                            .font(.headline)
-                            .foregroundColor(.wandrGreen)
-                        Text("Start a quest to see your progress here.")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                    }
+                    questSelection
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -82,6 +72,45 @@ struct ActiveQuestView: View {
         }
         .onDisappear {
             locationService.stop()
+        }
+    }
+
+    private var questSelection: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Choose your next quest")
+                    .font(.title2.bold())
+                    .foregroundStyle(Color.wandrGreen)
+                Text("Start a quest, complete its steps, then share your review.")
+                    .foregroundStyle(.secondary)
+                if viewModel.startableQuests.isEmpty {
+                    Text("You've completed all available quests. Check back for new discoveries.")
+                        .cardStyle()
+                }
+                ForEach(viewModel.startableQuests) { quest in
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(quest.title).font(.headline)
+                        Text(quest.place.name).foregroundStyle(.secondary)
+                        if let duration = quest.estimatedDuration {
+                            Label("\(duration) min", systemImage: "clock").font(.caption)
+                        }
+                        Button {
+                            Task { await viewModel.startQuest(quest) }
+                        } label: {
+                            Label("Start quest", systemImage: "flag.fill")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.wandrGreen)
+                        .disabled(viewModel.isWorking)
+                    }
+                    .cardStyle()
+                }
+                if viewModel.isWorking {
+                    ProgressView("Starting quest…").frame(maxWidth: .infinity)
+                }
+            }
+            .padding()
         }
     }
 
