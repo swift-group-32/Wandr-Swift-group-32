@@ -1,5 +1,6 @@
 import Foundation
 internal import Combine
+import CoreLocation
 
 @MainActor
 class ActiveQuestViewModel: ObservableObject {
@@ -94,6 +95,19 @@ class ActiveQuestViewModel: ObservableObject {
         return URL(string: "http://maps.apple.com/?daddr=\(place.latitude),\(place.longitude)")
     }
 
+        let arrivalRadius: Double = 100
+
+        func isAtDestination(_ userLocation: CLLocation?) -> Bool {
+            guard let userLocation = userLocation,
+                  let place = activeQuest?.quest.place else { return false }
+
+            let placeLocation = CLLocation(latitude: place.latitude, longitude: place.longitude)
+            return userLocation.distance(from: placeLocation) <= arrivalRadius
+        }
+
+        var nextObjective: QuestObjective? {
+            objectives.first { !isChecked($0) }
+        }
 
     var objectives: [QuestObjective] {
         let list = activeQuest?.quest.objectives ?? []

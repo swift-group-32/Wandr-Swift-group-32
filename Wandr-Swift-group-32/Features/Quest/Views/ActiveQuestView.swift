@@ -3,6 +3,7 @@ import PhotosUI
 
 struct ActiveQuestView: View {
     @StateObject private var viewModel = ActiveQuestViewModel()
+    @StateObject private var locationService = LocationService()
     @Environment(\.openURL) private var openURL
     @State private var showGiveUpConfirm = false
     @State private var showPhotoPicker = false
@@ -81,18 +82,44 @@ struct ActiveQuestView: View {
         .task {
             await viewModel.loadActiveQuest()
         }
+        .onAppear {
+            locationService.start()
+        }
+        .onDisappear {
+            locationService.stop()
+        }
     }
 
     func content(_ activeQuest: ActiveQuestDTO) -> some View {
         ScrollView {
             VStack(spacing: 16) {
                 statusCard(activeQuest)
+                if viewModel.isAtDestination(locationService.currentLocation) {
+                    arrivedCard()
+                }
                 destinationCard(activeQuest.quest.place)
                 objectivesSection()
                 giveUpButton()
             }
             .padding()
         }
+    }
+
+    func arrivedCard() -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("You've arrived!")
+                .font(.headline)
+                .foregroundColor(.white)
+            if let next = viewModel.nextObjective {
+                Text("Next step: \(next.title)")
+                    .font(.subheadline)
+                    .foregroundColor(.white.opacity(0.9))
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.wandrGreen)
+        .cornerRadius(16)
     }
 
     func statusCard(_ activeQuest: ActiveQuestDTO) -> some View {
@@ -129,10 +156,14 @@ struct ActiveQuestView: View {
                 .font(.headline)
                 .foregroundColor(.wandrGreen)
 
-            if let address = place.address {
-                Label(address, systemImage: "mappin.and.ellipse")
-                    .font(.caption)
-                    .foregroundColor(.gray)
+            if viewModel.isAtDestination(locationService.currentLocation) {
+                            Label("You're here!", systemImage: "location.circle.fill")
+                                .font(.caption)
+                                .foregroundColor(.wandrGreen)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.wandrSage.opacity(0.15))
+                                .cornerRadius(8)
             }
 
             Button {

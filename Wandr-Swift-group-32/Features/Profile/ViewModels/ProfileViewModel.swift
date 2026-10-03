@@ -1,5 +1,6 @@
 import Foundation
 internal import Combine
+import CoreLocation
 
 @MainActor
 class ProfileViewModel: ObservableObject {
@@ -51,7 +52,6 @@ class ProfileViewModel: ObservableObject {
         return week.weekId
     }
 
-    // MARK: - Level (next milestone)
 
     let xpPerLevel = 200
 
@@ -71,7 +71,6 @@ class ProfileViewModel: ObservableObject {
         Double(xpIntoLevel) / Double(xpPerLevel)
     }
 
-    // MARK: - This week
 
     var activeDaysCount: Int {
         profile?.streak.thisWeek.filter { $0 }.count ?? 0
