@@ -7,12 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6499976C306DA81A007616AC /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6499976B306DA81A007616AC /* Supabase */; };
-		6499976E306DA847007616AC /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6499976D306DA847007616AC /* Supabase */; };
+		B41DE8EA306F3ACA00C4B63D /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = B41DE8E9306F3ACA00C4B63D /* Supabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		64BDA47430665FB200D47911 /* PBXContainerItemProxy */ = {
+		02880E673067DAB100FD93F4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 02F6ECE73066092E00D705AF /* Project object */;
 			proxyType = 1;
@@ -22,37 +21,36 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		02880E633067DAB100FD93F4 /* Wandr-Swift-group-32Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wandr-Swift-group-32Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		02F6ECEF3066092E00D705AF /* Wandr-Swift-group-32.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wandr-Swift-group-32.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		64BDA47030665FB200D47911 /* Wandr-Swift-group-32Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wandr-Swift-group-32Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		02880E643067DAB100FD93F4 /* Wandr-Swift-group-32Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Wandr-Swift-group-32Tests";
+			sourceTree = "<group>";
+		};
 		02F6ECF13066092E00D705AF /* Wandr-Swift-group-32 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Wandr-Swift-group-32";
 			sourceTree = "<group>";
 		};
-		64BDA47130665FB200D47911 /* Wandr-Swift-group-32Tests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Wandr-Swift-group-32Tests";
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		02880E603067DAB100FD93F4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		02F6ECEC3066092E00D705AF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6499976E306DA847007616AC /* Supabase in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		64BDA46D30665FB200D47911 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				6499976C306DA81A007616AC /* Supabase in Frameworks */,
+				B41DE8EA306F3ACA00C4B63D /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,8 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				02F6ECF13066092E00D705AF /* Wandr-Swift-group-32 */,
-				64BDA47130665FB200D47911 /* Wandr-Swift-group-32Tests */,
-				6499976A306DA81A007616AC /* Frameworks */,
+				02880E643067DAB100FD93F4 /* Wandr-Swift-group-32Tests */,
 				02F6ECF03066092E00D705AF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -73,21 +70,37 @@
 			isa = PBXGroup;
 			children = (
 				02F6ECEF3066092E00D705AF /* Wandr-Swift-group-32.app */,
-				64BDA47030665FB200D47911 /* Wandr-Swift-group-32Tests.xctest */,
+				02880E633067DAB100FD93F4 /* Wandr-Swift-group-32Tests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		6499976A306DA81A007616AC /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		02880E623067DAB100FD93F4 /* Wandr-Swift-group-32Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 02880E693067DAB100FD93F4 /* Build configuration list for PBXNativeTarget "Wandr-Swift-group-32Tests" */;
+			buildPhases = (
+				02880E5F3067DAB100FD93F4 /* Sources */,
+				02880E603067DAB100FD93F4 /* Frameworks */,
+				02880E613067DAB100FD93F4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				02880E683067DAB100FD93F4 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				02880E643067DAB100FD93F4 /* Wandr-Swift-group-32Tests */,
+			);
+			name = "Wandr-Swift-group-32Tests";
+			packageProductDependencies = (
+			);
+			productName = "Wandr-Swift-group-32Tests";
+			productReference = 02880E633067DAB100FD93F4 /* Wandr-Swift-group-32Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		02F6ECEE3066092E00D705AF /* Wandr-Swift-group-32 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 02F6ECFA3066093200D705AF /* Build configuration list for PBXNativeTarget "Wandr-Swift-group-32" */;
@@ -105,35 +118,11 @@
 			);
 			name = "Wandr-Swift-group-32";
 			packageProductDependencies = (
-				6499976D306DA847007616AC /* Supabase */,
+				B41DE8E9306F3ACA00C4B63D /* Supabase */,
 			);
 			productName = "Wandr-Swift-group-32";
 			productReference = 02F6ECEF3066092E00D705AF /* Wandr-Swift-group-32.app */;
 			productType = "com.apple.product-type.application";
-		};
-		64BDA46F30665FB200D47911 /* Wandr-Swift-group-32Tests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 64BDA47630665FB200D47911 /* Build configuration list for PBXNativeTarget "Wandr-Swift-group-32Tests" */;
-			buildPhases = (
-				64BDA46C30665FB200D47911 /* Sources */,
-				64BDA46D30665FB200D47911 /* Frameworks */,
-				64BDA46E30665FB200D47911 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				64BDA47530665FB200D47911 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				64BDA47130665FB200D47911 /* Wandr-Swift-group-32Tests */,
-			);
-			name = "Wandr-Swift-group-32Tests";
-			packageProductDependencies = (
-				6499976B306DA81A007616AC /* Supabase */,
-			);
-			productName = "Wandr-Swift-group-32Tests";
-			productReference = 64BDA47030665FB200D47911 /* Wandr-Swift-group-32Tests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -142,15 +131,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2700;
+				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
+					02880E623067DAB100FD93F4 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 02F6ECEE3066092E00D705AF;
+					};
 					02F6ECEE3066092E00D705AF = {
 						CreatedOnToolsVersion = 26.3;
-					};
-					64BDA46F30665FB200D47911 = {
-						CreatedOnToolsVersion = 27.0;
-						TestTargetID = 02F6ECEE3066092E00D705AF;
 					};
 				};
 			};
@@ -164,7 +153,7 @@
 			mainGroup = 02F6ECE63066092E00D705AF;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				64999763306DA151007616AC /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				B41DE8E8306F3ACA00C4B63D /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 02F6ECF03066092E00D705AF /* Products */;
@@ -172,20 +161,20 @@
 			projectRoot = "";
 			targets = (
 				02F6ECEE3066092E00D705AF /* Wandr-Swift-group-32 */,
-				64BDA46F30665FB200D47911 /* Wandr-Swift-group-32Tests */,
+				02880E623067DAB100FD93F4 /* Wandr-Swift-group-32Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		02F6ECED3066092E00D705AF /* Resources */ = {
+		02880E613067DAB100FD93F4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		64BDA46E30665FB200D47911 /* Resources */ = {
+		02F6ECED3066092E00D705AF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -195,14 +184,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		02F6ECEB3066092E00D705AF /* Sources */ = {
+		02880E5F3067DAB100FD93F4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		64BDA46C30665FB200D47911 /* Sources */ = {
+		02F6ECEB3066092E00D705AF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -212,14 +201,59 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		64BDA47530665FB200D47911 /* PBXTargetDependency */ = {
+		02880E683067DAB100FD93F4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 02F6ECEE3066092E00D705AF /* Wandr-Swift-group-32 */;
-			targetProxy = 64BDA47430665FB200D47911 /* PBXContainerItemProxy */;
+			targetProxy = 02880E673067DAB100FD93F4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		02880E6A3067DAB100FD93F4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "cata.Wandr-Swift-group-32Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Wandr-Swift-group-32.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Wandr-Swift-group-32";
+			};
+			name = Debug;
+		};
+		02880E6B3067DAB100FD93F4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "cata.Wandr-Swift-group-32Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Wandr-Swift-group-32.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Wandr-Swift-group-32";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		02F6ECF83066093200D705AF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -345,6 +379,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Wandr uses your location to know when you arrive at a quest.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -387,6 +422,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Wandr uses your location to know when you arrive at a quest.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -418,56 +454,18 @@
 			};
 			name = Release;
 		};
-		64BDA47730665FB200D47911 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.wandr.Wandr-Swift-group-32Tests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Wandr-Swift-group-32.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Wandr-Swift-group-32";
-				XROS_DEPLOYMENT_TARGET = 27.0;
-			};
-			name = Debug;
-		};
-		64BDA47830665FB200D47911 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.wandr.Wandr-Swift-group-32Tests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Wandr-Swift-group-32.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Wandr-Swift-group-32";
-				VALIDATE_PRODUCT = YES;
-				XROS_DEPLOYMENT_TARGET = 27.0;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		02880E693067DAB100FD93F4 /* Build configuration list for PBXNativeTarget "Wandr-Swift-group-32Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				02880E6A3067DAB100FD93F4 /* Debug */,
+				02880E6B3067DAB100FD93F4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		02F6ECEA3066092E00D705AF /* Build configuration list for PBXProject "Wandr-Swift-group-32" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -486,19 +484,10 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		64BDA47630665FB200D47911 /* Build configuration list for PBXNativeTarget "Wandr-Swift-group-32Tests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				64BDA47730665FB200D47911 /* Debug */,
-				64BDA47830665FB200D47911 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		64999763306DA151007616AC /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+		B41DE8E8306F3ACA00C4B63D /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/supabase/supabase-swift";
 			requirement = {
@@ -509,14 +498,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6499976B306DA81A007616AC /* Supabase */ = {
+		B41DE8E9306F3ACA00C4B63D /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 64999763306DA151007616AC /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Supabase;
-		};
-		6499976D306DA847007616AC /* Supabase */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 64999763306DA151007616AC /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = B41DE8E8306F3ACA00C4B63D /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */
