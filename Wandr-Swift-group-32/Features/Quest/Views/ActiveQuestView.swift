@@ -42,6 +42,9 @@ struct ActiveQuestView: View {
             .background(Color.wandrCream)
             .navigationTitle("Active Quest")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(item: $viewModel.reviewContext) { context in
+                RatingReviewView(context: context)
+            }
             .alert("Give up this quest?", isPresented: $showGiveUpConfirm) {
                 Button("Cancel", role: .cancel) { }
                 Button("Give up", role: .destructive) {
@@ -60,14 +63,6 @@ struct ActiveQuestView: View {
                 Text(viewModel.actionError ?? "")
             }
 
-            .alert("Quest completed! 🎉", isPresented: Binding(
-                get: { viewModel.completionMessage != nil },
-                set: { if !$0 { viewModel.completionMessage = nil } }
-            )) {
-                Button("OK", role: .cancel) { }
-            } message: {
-                Text(viewModel.completionMessage ?? "")
-            }
             .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhoto, matching: .images)
             .onChange(of: selectedPhoto) { _, newItem in
                 guard let newItem = newItem, let objective = photoObjective else { return }
