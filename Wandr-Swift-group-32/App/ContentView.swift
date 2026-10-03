@@ -2,7 +2,11 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @State private var selectedTab: AppTab = .home
+    @State private var selectedTab: AppTab
+
+    init(initialTab: AppTab = .home) {
+        _selectedTab = State(initialValue: initialTab)
+    }
 
     var body: some View {
 
@@ -31,17 +35,9 @@ struct ContentView: View {
             }
             .tag(AppTab.explore)
             
-            placeholderView(
-                            title: "Map",
-                            icon: "map"
-                        )
-                        .tabItem {
-                            Label(
-                                "Map",
-                                systemImage: "map"
-                            )
-                        }
-                        .tag(AppTab.map)
+            DiscoveryMapView()
+                .tabItem { Label("Map", systemImage: "map") }
+                .tag(AppTab.map)
 
             ActiveQuestView()
                 .tabItem {
@@ -66,21 +62,7 @@ struct ContentView: View {
         .tint(.wandrGreen)
     }
     
-    @ViewBuilder
-        private func placeholderView(
-            title: String,
-            icon: String
-        ) -> some View {
-            VStack(spacing: 16) {
-                Image(systemName: icon)
-                    .font(.system(size: 50))
 
-                Text(title)
-                    .font(.title)
-                    .fontWeight(.bold)
-            }
-            .foregroundStyle(Color("WandrPrimary"))
-        }
 }
 
 #Preview {

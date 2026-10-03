@@ -35,3 +35,7 @@ xcuserdata/
 
 # Local architecture guides and generated exploration artifacts
 /artifacts/
+
+# Local documentation and helper scripts
+/docs/
+/scripts/
