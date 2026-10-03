@@ -12,8 +12,13 @@ class ActiveQuestViewModel: ObservableObject {
     @Published var isWorking = false
     @Published var actionError: String? = nil
     @Published var reviewContext: ReviewContext? = nil
+    @Published var startableQuests: [StartableQuestDTO] = []
 
-    private let service = ActiveQuestService()
+    private let service: any ActiveQuestServing
+
+    init(service: (any ActiveQuestServing)? = nil) {
+        self.service = service ?? ActiveQuestService()
+    }
 
     func loadActiveQuest(showLoading: Bool = true) async {
         if showLoading { isLoading = true }
@@ -21,12 +26,26 @@ class ActiveQuestViewModel: ObservableObject {
 
         do {
             activeQuest = try await service.fetchActiveQuest()
+            startableQuests = activeQuest == nil ? try await service.fetchStartableQuests() : []
         } catch {
             print("Active quest error:", error)
             errorMessage = "Could not load your quest. Check your connection."
         }
 
         isLoading = false
+    }
+
+    func startQuest(_ quest: StartableQuestDTO) async {
+        guard !isWorking else { return }
+        isWorking = true
+        actionError = nil
+        defer { isWorking = false }
+        do {
+            try await service.startQuest(questId: quest.id)
+            await loadActiveQuest(showLoading: false)
+        } catch {
+            actionError = "Could not start this quest. Please try again."
+        }
     }
 
     func checkObjective(_ objective: QuestObjective) async {

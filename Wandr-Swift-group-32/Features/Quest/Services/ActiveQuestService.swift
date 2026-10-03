@@ -2,11 +2,44 @@ import Foundation
 import Supabase
 import UIKit
 
-class ActiveQuestService {
+@MainActor
+protocol ActiveQuestServing {
+    func fetchActiveQuest() async throws -> ActiveQuestDTO?
+    func fetchStartableQuests() async throws -> [StartableQuestDTO]
+    func startQuest(questId: String) async throws
+    func completeObjective(questId: String, objectiveId: String, photoPath: String?) async throws -> ObjectiveResult
+    func uploadProofPhoto(questId: String, objectiveId: String, imageData: Data) async throws -> String
+    func abandonQuest(questId: String) async throws
+}
+
+@MainActor
+class ActiveQuestService: ActiveQuestServing {
 
     // true  = mock data
     // false = calls Supabase
     let useMockData = false
+
+    func fetchStartableQuests() async throws -> [StartableQuestDTO] {
+        try await signInTestUserIfNeeded()
+        let userId = try await supabase.auth.session.user.id
+        let catalog = try await supabase.from("quests")
+            .select("id, title, estimated_duration, place:places(name)")
+            .order("title", ascending: true).execute()
+        let completions = try await supabase.from("quest_completions")
+            .select("quest_id").eq("user_id", value: userId)
+            .eq("status", value: "completed").execute()
+        struct Completion: Decodable { let questId: String }
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        let completed = Set(try decoder.decode([Completion].self, from: completions.data).map(\.questId))
+        return try decoder.decode([StartableQuestDTO].self, from: catalog.data)
+            .filter { !completed.contains($0.id) }
+    }
+
+    func startQuest(questId: String) async throws {
+        try await signInTestUserIfNeeded()
+        try await supabase.rpc("start_quest", params: ["p_quest_id": questId]).execute()
+    }
 
     func fetchActiveQuest() async throws -> ActiveQuestDTO? {
         if useMockData {

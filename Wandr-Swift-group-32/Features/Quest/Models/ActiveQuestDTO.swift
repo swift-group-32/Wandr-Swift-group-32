@@ -1,5 +1,16 @@
 import Foundation
 
+struct StartableQuestDTO: Decodable, Identifiable {
+    let id: String
+    let title: String
+    let estimatedDuration: Int?
+    let place: StartableQuestPlace
+}
+
+struct StartableQuestPlace: Decodable {
+    let name: String
+}
+
 struct ActiveQuestDTO: Codable {
     let id: String
     let questId: String
