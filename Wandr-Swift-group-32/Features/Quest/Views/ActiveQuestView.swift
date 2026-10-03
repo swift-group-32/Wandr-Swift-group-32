@@ -41,15 +41,15 @@ struct ActiveQuestView: View {
             .background(Color.wandrCream)
             .navigationTitle("Active Quest")
             .navigationBarTitleDisplayMode(.inline)
-            // Asks before giving up the quest
-            .confirmationDialog("Give up this quest?", isPresented: $showGiveUpConfirm, titleVisibility: .visible) {
+            .alert("Give up this quest?", isPresented: $showGiveUpConfirm) {
+                Button("Cancel", role: .cancel) { }
                 Button("Give up", role: .destructive) {
                     Task { await viewModel.giveUp() }
                 }
             } message: {
                 Text("Your progress on this quest will be lost.")
             }
-            // Shown when an action fails
+    
             .alert("Something went wrong", isPresented: Binding(
                 get: { viewModel.actionError != nil },
                 set: { if !$0 { viewModel.actionError = nil } }
@@ -58,7 +58,7 @@ struct ActiveQuestView: View {
             } message: {
                 Text(viewModel.actionError ?? "")
             }
-            // CHANGE C: shown when the whole quest is completed
+
             .alert("Quest completed! 🎉", isPresented: Binding(
                 get: { viewModel.completionMessage != nil },
                 set: { if !$0 { viewModel.completionMessage = nil } }

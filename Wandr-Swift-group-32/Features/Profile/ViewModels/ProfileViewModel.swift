@@ -23,22 +23,78 @@ class ProfileViewModel: ObservableObject {
         isLoading = false
     }
 
+    var weekDifference: Int? {
+        guard let history = profile?.streak.weeklyHistory, history.count >= 2 else { return nil }
+        return history[history.count - 1].quests - history[history.count - 2].quests
+    }
 
     var comparisonMessage: String {
-        guard let history = profile?.streak.weeklyHistory, history.count >= 2 else {
+        guard let difference = weekDifference else {
             return "Not enough weeks yet to compare. Keep going!"
         }
-
-        let thisWeek = history[history.count - 1].quests
-        let lastWeek = history[history.count - 2].quests
-        let difference = thisWeek - lastWeek
+        let amount = abs(difference)
+        let word = amount == 1 ? "quest" : "quests"
 
         if difference > 0 {
-            return "You're improving! \(difference) more quests than last week"
+            return "You're improving! \(amount) more \(word) than last week!"
         } else if difference < 0 {
-            return "\(-difference) fewer quests than last week. You can do it!"
+            return "\(amount) fewer \(word) than last week. You can catch up!"
         } else {
             return "Same as last week. Keep the pace!"
         }
+    }
+
+    func weekLabel(_ week: WeekData) -> String {
+        if week.id == profile?.streak.weeklyHistory.last?.id {
+            return "This week"
+        }
+        return week.weekId
+    }
+
+    // MARK: - Level (next milestone)
+
+    let xpPerLevel = 200
+
+    var nextLevel: Int {
+        (profile?.stats.level ?? 1) + 1
+    }
+
+    var xpIntoLevel: Int {
+        (profile?.stats.points ?? 0) % xpPerLevel
+    }
+
+    var xpToGo: Int {
+        xpPerLevel - xpIntoLevel
+    }
+
+    var levelProgress: Double {
+        Double(xpIntoLevel) / Double(xpPerLevel)
+    }
+
+    // MARK: - This week
+
+    var activeDaysCount: Int {
+        profile?.streak.thisWeek.filter { $0 }.count ?? 0
+    }
+
+    var todayIndex: Int {
+        let weekday = Calendar.current.component(.weekday, from: Date())
+        return (weekday + 5) % 7
+    }
+
+
+    var unlockedCount: Int {
+        profile?.achievements.filter { $0.unlocked }.count ?? 0
+    }
+
+    var totalBadges: Int {
+        profile?.achievements.count ?? 0
+    }
+
+    func badgeSubtitle(_ achievement: Achievement) -> String {
+        if achievement.unlocked {
+            return "Unlocked \(achievement.earnedOn ?? "")"
+        }
+        return achievement.description ?? "Keep exploring to unlock it"
     }
 }

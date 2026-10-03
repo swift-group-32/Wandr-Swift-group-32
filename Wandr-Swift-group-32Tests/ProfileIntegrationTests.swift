@@ -13,7 +13,7 @@ struct ProfileIntegrationTests {
 
         return StreakDTO(
             userId: "test",
-            stats: UserStats(questsCompleted: 10, points: 100),
+            stats: UserStats(questsCompleted: 10, points: 100, level: 1),
             streak: StreakInfo(
                 currentStreak: 3,
                 thisWeek: [true, false, false, false, false, false, false],
@@ -27,7 +27,7 @@ struct ProfileIntegrationTests {
         let json = """
         {
           "user_id": "123",
-          "stats": { "quests_completed": 47, "points": 850 },
+          "stats": { "quests_completed": 47, "points": 850, "level": 5 },
           "streak": {
             "current_streak": 14,
             "this_week": [true, true, true, true, true, true, false],
@@ -37,7 +37,7 @@ struct ProfileIntegrationTests {
             ]
           },
           "achievements": [
-            { "id": "1", "name": "First Foot", "unlocked": true }
+         { "id": "1", "name": "First Foot", "description": "Complete your first quest", "unlocked": true, "earned_on": "Sep 25" }
           ]
         }
         """
@@ -52,6 +52,7 @@ struct ProfileIntegrationTests {
         #expect(profile.streak.thisWeek.count == 7)
         #expect(profile.streak.weeklyHistory.count == 2)
         #expect(profile.achievements.first?.name == "First Foot")
+        #expect(profile.achievements.first?.earnedOn == "Sep 25")
     }
     
     @Test @MainActor func loadsStreakThroughService() async {

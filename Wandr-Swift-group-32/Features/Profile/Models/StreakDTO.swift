@@ -9,9 +9,10 @@ struct StreakDTO: Codable{
     let achievements: [Achievement]
 }
 
-struct UserStats: Codable{
+struct UserStats: Codable {
     let questsCompleted: Int
     let points: Int
+    let level: Int
 }
 
 struct StreakInfo: Codable{
@@ -29,17 +30,19 @@ struct WeekData: Codable, Identifiable{
 struct Achievement: Codable, Identifiable {
     let id: String
     let name: String
+    let description: String?
     let unlocked: Bool
+    let earnedOn: String?
 }
-
 //Mockup Data
 extension StreakDTO {
     static let mock = StreakDTO(
         userId: "123",
         stats: UserStats(
-            questsCompleted: 47,
-            points: 850
-        ),
+                    questsCompleted: 47,
+                    points: 850,
+                    level: 5
+                ),
         streak: StreakInfo(
             currentStreak: 14,
             thisWeek: [true, true, true, true, true, true, false],
@@ -51,9 +54,9 @@ extension StreakDTO {
             ]
         ),
         achievements: [
-            Achievement(id: "1", name: "First Foot", unlocked: true),
-            Achievement(id: "2", name: "Two-Weeker", unlocked: true),
-            Achievement(id: "3", name: "Peak Climber", unlocked: false)
-        ]
+                    Achievement(id: "1", name: "First Foot", description: "Complete your first quest", unlocked: true, earnedOn: "Sep 25"),
+                    Achievement(id: "2", name: "Two-Weeker", description: "Keep a 14-day streak", unlocked: true, earnedOn: "Oct 01"),
+                    Achievement(id: "3", name: "Peak Climber", description: "Complete 3 outdoor quests", unlocked: false, earnedOn: nil)
+                ]
     )
 }
