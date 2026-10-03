@@ -11,7 +11,7 @@ class ActiveQuestViewModel: ObservableObject {
 
     @Published var isWorking = false
     @Published var actionError: String? = nil
-    @Published var completionMessage: String? = nil
+    @Published var reviewContext: ReviewContext? = nil
 
     private let service = ActiveQuestService()
 
@@ -70,7 +70,13 @@ class ActiveQuestViewModel: ObservableObject {
         )
 
         if result.questCompleted {
-            completionMessage = "You earned \(result.xpEarned) XP. Great job!"
+            reviewContext = ReviewContext(
+                questId: activeQuest.questId,
+                title: activeQuest.quest.title,
+                placeName: activeQuest.quest.place.name,
+                address: activeQuest.quest.place.address,
+                xpEarned: result.xpEarned
+            )
         }
 
         await loadActiveQuest(showLoading: false)

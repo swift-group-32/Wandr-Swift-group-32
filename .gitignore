@@ -1,0 +1,37 @@
+# macOS metadata
+.DS_Store
+._*
+
+# Xcode build output and caches
+build/
+DerivedData/
+*.xcarchive
+*.xcresult
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# Personal Xcode settings (keep shared schemes and workspace files)
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# Swift Package Manager generated files
+.build/
+.swiftpm/
+# Keep Package.resolved tracked for reproducible application dependencies.
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Editor temporary files
+*.swp
+*.swo
+*~
+
+# Local architecture guides and generated exploration artifacts
+/artifacts/
