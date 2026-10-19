@@ -28,16 +28,6 @@ struct ProfileView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.wandrCream)
             .navigationTitle("Profile")
-            .toolbar {
-                // Current streak, next to the title
-                ToolbarItem(placement: .topBarTrailing) {
-                    if let profile = viewModel.profile {
-                        Label("\(profile.streak.currentStreak)", systemImage: "flame.fill")
-                            .font(.subheadline).bold()
-                            .foregroundColor(.wandrGreen)
-                    }
-                }
-            }
         }
         .task {
             await viewModel.loadStreak(userId: userId)
@@ -56,7 +46,7 @@ struct ProfileView: View {
         }
     }
 
-    // 1. Next milestone: progress to the next level
+
     func levelCard() -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
@@ -86,9 +76,14 @@ struct ProfileView: View {
     func weekCard(_ profile: StreakDTO) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("THIS WEEK")
-                    .font(.caption2)
-                    .foregroundColor(.gray)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("THIS WEEK")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                    Label("\(profile.streak.currentStreak)-day streak", systemImage: "flame.fill")
+                        .font(.subheadline).bold()
+                        .foregroundColor(.wandrGreen)
+                }
                 Spacer()
                 Text("\(viewModel.activeDaysCount)/7 days")
                     .font(.caption).bold()
