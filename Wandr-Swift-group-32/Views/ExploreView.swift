@@ -5,6 +5,7 @@ struct ExploreView: View {
     @Binding var selectedTab: AppTab
     @Binding var savedQuestIds: Set<String>
     @Binding var savedEventIds: Set<String>
+    
     @Binding var selectedCategory: String
 
     @State private var selectedDateFilter = "This Week"
@@ -683,6 +684,20 @@ struct ExploreView: View {
                 }
             )
         }
+        
+        .sheet(item: $selectedQuest) { quest in
+            ExploreQuestDetailsView(
+                quest: quest,
+                isSaved: savedQuestIds.contains(quest.id),
+                onSave: { quest, isSaved in
+                    if isSaved {
+                        savedQuestIds.insert(quest.id)
+                    } else {
+                        savedQuestIds.remove(quest.id)
+                    }
+                }
+            )
+        }
     }
 
     // MARK: - Load Upcoming Events
@@ -1047,6 +1062,283 @@ struct QuestExploreCard: View {
 
         switch category.lowercased() {
 
+        case "outdoor":
+            return "figure.hiking"
+
+        case "food":
+            return "fork.knife"
+
+        case "culture":
+            return "paintpalette"
+
+        case "music":
+            return "music.note"
+
+        case "games":
+            return "gamecontroller"
+
+        default:
+            return "sparkles"
+        }
+    }
+}
+
+// MARK: - Quest Details
+
+struct ExploreQuestDetailsView: View {
+    let quest: Quest
+    let isSaved: Bool
+    let onSave: (Quest, Bool) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var saved: Bool
+
+    init(
+        quest: Quest,
+        isSaved: Bool,
+        onSave: @escaping (Quest, Bool) -> Void
+    ) {
+        self.quest = quest
+        self.isSaved = isSaved
+        self.onSave = onSave
+        _saved = State(initialValue: isSaved)
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+
+            // MARK: Header
+
+            ZStack {
+                Text("Quest Details")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.primary)
+
+                HStack {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "arrow.left")
+                            .font(.title3)
+                            .foregroundStyle(Color("WandrPrimary"))
+                    }
+
+                    Spacer()
+
+                    Button {
+                        saved.toggle()
+                        onSave(quest, saved)
+                    } label: {
+                        Image(
+                            systemName: saved
+                                ? "bookmark.fill"
+                                : "bookmark"
+                        )
+                        .font(.title3)
+                        .foregroundStyle(Color("WandrPrimary"))
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 12)
+            .padding(.bottom, 18)
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+
+                    // MARK: Quest Image
+
+                    ZStack {
+                        Color("WandrSecondary")
+
+                        Image(
+                            systemName: iconForQuestCategory(
+                                quest.category
+                            )
+                        )
+                        .font(.system(size: 70))
+                        .foregroundStyle(.white)
+                    }
+                    .frame(
+                        maxWidth: .infinity,
+                        minHeight: 240,
+                        maxHeight: 240
+                    )
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: 24)
+                    )
+
+                    // MARK: Category
+
+                    Text(quest.category.uppercased())
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(
+                            Color("WandrSecondary")
+                        )
+
+                    // MARK: Title
+
+                    Text(quest.title)
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundStyle(
+                            Color("WandrPrimary")
+                        )
+
+                    // MARK: Description
+
+                    Text(quest.description)
+                        .font(.body)
+                        .foregroundStyle(.primary)
+
+                    Divider()
+
+                    // MARK: Duration
+
+                    HStack(spacing: 12) {
+                        Image(systemName: "clock.fill")
+                            .foregroundStyle(
+                                Color("WandrSecondary")
+                            )
+
+                        VStack(
+                            alignment: .leading,
+                            spacing: 3
+                        ) {
+                            Text("Duration")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+
+                            Text("\(quest.duration) min")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+
+                        Spacer()
+                    }
+
+                    // MARK: Rating
+
+                    HStack(spacing: 12) {
+                        Image(systemName: "star.fill")
+                            .foregroundStyle(
+                                Color("WandrSecondary")
+                            )
+
+                        VStack(
+                            alignment: .leading,
+                            spacing: 3
+                        ) {
+                            Text("Rating")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+
+                            Text(
+                                String(
+                                    format: "%.1f",
+                                    quest.rating
+                                )
+                            )
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        }
+
+                        Spacer()
+                    }
+
+                    Divider()
+
+                    // MARK: Objectives
+
+                    Text("Quest objectives")
+                        .font(.headline)
+                        .foregroundStyle(
+                            Color("WandrPrimary")
+                        )
+
+                    objectiveRow(
+                        icon: "figure.walk",
+                        text: "Complete the activity"
+                    )
+
+                    objectiveRow(
+                        icon: "location.fill",
+                        text: "Explore the selected location"
+                    )
+
+                    objectiveRow(
+                        icon: "sparkles",
+                        text: "Enjoy the experience"
+                    )
+
+                    // MARK: Reward
+
+                    HStack {
+                        Text("Reward")
+                            .font(.body)
+
+                        Spacer()
+
+                        Text("+50 XP")
+                            .fontWeight(.semibold)
+                            .foregroundStyle(
+                                Color("WandrSecondary")
+                            )
+                    }
+
+                    // MARK: Accept
+
+                    Button {
+                        // Quest acceptance can be connected later.
+                    } label: {
+                        Text("Accept Quest")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 15)
+                            .background(
+                                Color("WandrPrimary")
+                            )
+                            .clipShape(
+                                RoundedRectangle(
+                                    cornerRadius: 14
+                                )
+                            )
+                    }
+                }
+                .padding(20)
+            }
+        }
+        .background(
+            Color("WandrBackground")
+        )
+    }
+
+    private func objectiveRow(
+        icon: String,
+        text: String
+    ) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .foregroundStyle(
+                    Color("WandrSecondary")
+                )
+                .frame(width: 24)
+
+            Text(text)
+                .font(.subheadline)
+
+            Spacer()
+        }
+    }
+
+    private func iconForQuestCategory(
+        _ category: String
+    ) -> String {
+        switch category.lowercased() {
         case "outdoor":
             return "figure.hiking"
 
@@ -1543,8 +1835,7 @@ struct ExploreEventDetailsView: View {
 
         savedEventIds:
             .constant([]),
-
-        selectedCategory:
-            .constant("All")
+        
+        selectedCategory: .constant("All")
     )
 }

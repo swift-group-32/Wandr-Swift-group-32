@@ -8,34 +8,36 @@
 import SwiftUI
 
 struct RecommendedQuestsView: View {
-
+    
     let quests: [Quest]
-
+    
     @Binding var savedQuestIds: Set<String>
-
+    
     @Binding var selectedTab: AppTab
-
+    
     @Environment(\.dismiss) private var dismiss
-
+    
+    @State private var selectedQuest: Quest?
+    
     var body: some View {
-
+        
         VStack(spacing: 0) {
-
+            
             ScrollView {
-
+                
                 VStack(
                     alignment: .leading,
                     spacing: 0
                 ) {
-
+                    
                     // MARK: Header
-
+                    
                     HStack(spacing: 12) {
-
+                        
                         Button {
                             dismiss()
                         } label: {
-
+                            
                             Image(
                                 systemName: "chevron.left"
                             )
@@ -45,7 +47,7 @@ struct RecommendedQuestsView: View {
                                 Color("WandrPrimary")
                             )
                         }
-
+                        
                         Image("WandrLogo")
                             .resizable()
                             .scaledToFit()
@@ -53,16 +55,16 @@ struct RecommendedQuestsView: View {
                                 width: 42,
                                 height: 42
                             )
-
+                        
                         Text("Explore Quests")
                             .font(.title3)
                             .fontWeight(.semibold)
                             .foregroundStyle(
                                 Color("WandrPrimary")
                             )
-
+                        
                         Spacer()
-
+                        
                         Image(
                             systemName: "person.circle.fill"
                         )
@@ -74,21 +76,21 @@ struct RecommendedQuestsView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 14)
                     .padding(.bottom, 22)
-
+                    
                     // MARK: Curated For You
-
+                    
                     VStack(
                         alignment: .leading,
                         spacing: 8
                     ) {
-
+                        
                         Text("Curated For You")
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundStyle(
                                 Color("WandrPrimary")
                             )
-
+                        
                         Text(
                             "Based on your activity and interests"
                         )
@@ -97,189 +99,194 @@ struct RecommendedQuestsView: View {
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 18)
-
+                    
                     // MARK: Spotlight
-
+                    
                     if let spotlightQuest = quests.first {
-
-                        VStack(
-                            alignment: .leading,
-                            spacing: 10
-                        ) {
-
-                            HStack {
-
-                                Text("⚡ SPOTLIGHT SIDE QUEST")
-                                    .font(.caption)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(
-                                        Color("WandrSecondary")
-                                    )
-
-                                Spacer()
-
-                                Text("For you")
-                                    .font(.caption)
-                                    .foregroundStyle(
-                                        .secondary
-                                    )
-                            }
-
+                        
+                        Button {
+                            selectedQuest = spotlightQuest
+                        } label: {
+                            
                             VStack(
                                 alignment: .leading,
-                                spacing: 0
+                                spacing: 10
                             ) {
-
-                                ZStack(
-                                    alignment: .bottomLeading
-                                ) {
-
-                                    RoundedRectangle(
-                                        cornerRadius: 20
-                                    )
-                                    .fill(
-                                        Color(
-                                            "WandrSecondary"
+                                
+                                HStack {
+                                    
+                                    Text("⚡ SPOTLIGHT SIDE QUEST")
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                        .foregroundStyle(
+                                            Color("WandrSecondary")
                                         )
-                                    )
-                                    .frame(
-                                        height: 180
-                                    )
-
+                                    
+                                    Spacer()
+                                    
+                                    Text("For you")
+                                        .font(.caption)
+                                        .foregroundStyle(
+                                            .secondary
+                                        )
+                                }
+                                
+                                VStack(
+                                    alignment: .leading,
+                                    spacing: 0
+                                ) {
+                                    
+                                    ZStack(
+                                        alignment: .bottomLeading
+                                    ) {
+                                        
+                                        RoundedRectangle(
+                                            cornerRadius: 20
+                                        )
+                                        .fill(
+                                            Color(
+                                                "WandrSecondary"
+                                            )
+                                        )
+                                        .frame(
+                                            height: 180
+                                        )
+                                        
+                                        VStack(
+                                            alignment: .leading,
+                                            spacing: 5
+                                        ) {
+                                            
+                                            Text(
+                                                spotlightQuest.category
+                                            )
+                                            .font(.caption)
+                                            .fontWeight(
+                                                .semibold
+                                            )
+                                            .foregroundStyle(
+                                                .white
+                                            )
+                                            
+                                            Text(
+                                                spotlightQuest.title
+                                            )
+                                            .font(.title3)
+                                            .fontWeight(
+                                                .bold
+                                            )
+                                            .foregroundStyle(
+                                                .white
+                                            )
+                                        }
+                                        .padding(18)
+                                    }
+                                    
                                     VStack(
                                         alignment: .leading,
-                                        spacing: 5
+                                        spacing: 6
                                     ) {
-
-                                        Text(
-                                            spotlightQuest.category
-                                        )
-                                        .font(.caption)
-                                        .fontWeight(
-                                            .semibold
-                                        )
-                                        .foregroundStyle(
-                                            .white
-                                        )
-
+                                        
                                         Text(
                                             spotlightQuest.title
                                         )
-                                        .font(.title3)
-                                        .fontWeight(
-                                            .bold
-                                        )
+                                        .font(.headline)
+                                        .fontWeight(.bold)
                                         .foregroundStyle(
-                                            .white
+                                            Color(
+                                                "WandrPrimary"
+                                            )
                                         )
-                                    }
-                                    .padding(18)
-                                }
-
-                                VStack(
-                                    alignment: .leading,
-                                    spacing: 6
-                                ) {
-
-                                    Text(
-                                        spotlightQuest.title
-                                    )
-                                    .font(.headline)
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(
-                                        Color(
-                                            "WandrPrimary"
+                                        
+                                        Text(
+                                            spotlightQuest.description
                                         )
-                                    )
-
-                                    Text(
-                                        spotlightQuest.description
-                                    )
-                                    .font(.subheadline)
-                                    .foregroundStyle(
-                                        .secondary
-                                    )
-                                    .lineLimit(2)
-
-                                    HStack {
-
-                                        Label(
-                                            "\(spotlightQuest.duration) min",
-                                            systemImage: "clock"
+                                        .font(.subheadline)
+                                        .foregroundStyle(
+                                            .secondary
                                         )
-
-                                        Spacer()
-
-                                        Button {
-
-                                            if savedQuestIds.contains(
-                                                spotlightQuest.id
-                                            ) {
-
-                                                savedQuestIds.remove(
+                                        .lineLimit(2)
+                                        
+                                        HStack {
+                                            
+                                            Label(
+                                                "\(spotlightQuest.duration) min",
+                                                systemImage: "clock"
+                                            )
+                                            
+                                            Spacer()
+                                            
+                                            Button {
+                                                
+                                                if savedQuestIds.contains(
                                                     spotlightQuest.id
-                                                )
-
-                                            } else {
-
-                                                savedQuestIds.insert(
-                                                    spotlightQuest.id
-                                                )
-                                            }
-
-                                        } label: {
-
-                                            Image(
-                                                systemName:
-                                                    savedQuestIds.contains(
+                                                ) {
+                                                    
+                                                    savedQuestIds.remove(
                                                         spotlightQuest.id
                                                     )
+                                                    
+                                                } else {
+                                                    
+                                                    savedQuestIds.insert(
+                                                        spotlightQuest.id
+                                                    )
+                                                }
+                                                
+                                            } label: {
+                                                
+                                                Image(
+                                                    systemName:
+                                                        savedQuestIds.contains(
+                                                            spotlightQuest.id
+                                                        )
                                                     ? "bookmark.fill"
                                                     : "bookmark"
-                                            )
-                                            .foregroundStyle(
-                                                Color(
-                                                    "WandrPrimary"
                                                 )
-                                            )
+                                                .foregroundStyle(
+                                                    Color(
+                                                        "WandrPrimary"
+                                                    )
+                                                )
+                                            }
                                         }
+                                        .font(.caption)
+                                        .foregroundStyle(
+                                            .secondary
+                                        )
                                     }
-                                    .font(.caption)
-                                    .foregroundStyle(
-                                        .secondary
-                                    )
+                                    .padding(16)
                                 }
-                                .padding(16)
-                            }
-                            .background(
-                                Color.white
-                            )
-                            .clipShape(
-                                RoundedRectangle(
-                                    cornerRadius: 20
+                                .background(
+                                    Color.white
                                 )
-                            )
+                                .clipShape(
+                                    RoundedRectangle(
+                                        cornerRadius: 20
+                                    )
+                                )
+                            }
+                            .padding(.horizontal, 20)
                         }
-                        .padding(.horizontal, 20)
                     }
-
+                    
                     // MARK: Curated Micro-Tracks
-
+                    
                     VStack(
                         alignment: .leading,
-                        spacing: 14
+                        spacing: 8
                     ) {
-
+                        
                         HStack {
-
+                            
                             Text("Curated Micro-Tracks")
                                 .font(.headline)
                                 .foregroundStyle(
                                     Color("WandrPrimary")
                                 )
-
+                            
                             Spacer()
-
+                            
                             Text(
                                 "\(quests.count)"
                             )
@@ -289,133 +296,143 @@ struct RecommendedQuestsView: View {
                                 Color("WandrSecondary")
                             )
                         }
-
+                        
                         ForEach(
                             Array(
                                 quests.dropFirst()
                             )
                         ) { quest in
-
-                            HStack(spacing: 12) {
-
-                                ZStack {
-
-                                    RoundedRectangle(
-                                        cornerRadius: 12
-                                    )
-                                    .fill(
-                                        Color(
-                                            "WandrSecondary"
+                            
+                            Button {
+                                selectedQuest = quest
+                            } label: {
+                                
+                                HStack(spacing: 12) {
+                                    
+                                    ZStack {
+                                        RoundedRectangle(
+                                            cornerRadius: 12
                                         )
-                                    )
-
-                                    Image(
-                                        systemName:
-                                            iconForCategory(
+                                        .fill(
+                                            Color("WandrSecondary")
+                                        )
+                                        
+                                        Image(
+                                            systemName: iconForCategory(
                                                 quest.category
                                             )
-                                    )
-                                    .foregroundStyle(
-                                        .white
-                                    )
-                                }
-                                .frame(
-                                    width: 64,
-                                    height: 64
-                                )
-
-                                VStack(
-                                    alignment: .leading,
-                                    spacing: 4
-                                ) {
-
-                                    Text(quest.title)
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-                                        .foregroundStyle(
-                                            Color(
-                                                "WandrPrimary"
-                                            )
                                         )
-                                        .lineLimit(2)
-
-                                    Text(
-                                        "\(quest.duration) min · \(quest.category)"
+                                        .foregroundStyle(.white)
+                                    }
+                                    .frame(
+                                        width: 64,
+                                        height: 64
                                     )
-                                    .font(.caption)
+                                    
+                                    VStack(
+                                        alignment: .leading,
+                                        spacing: 4
+                                    ) {
+                                        
+                                        Text(quest.title)
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                            .foregroundStyle(
+                                                Color("WandrPrimary")
+                                            )
+                                            .lineLimit(2)
+                                        
+                                        Text(
+                                            "\(quest.duration) min · \(quest.category)"
+                                        )
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Image(
+                                        systemName: "chevron.right"
+                                    )
                                     .foregroundStyle(
-                                        .secondary
+                                        Color("WandrSecondary")
                                     )
                                 }
-
-                                Spacer()
-
-                                Image(
-                                    systemName:
-                                        "chevron.right"
-                                )
-                                .foregroundStyle(
-                                    Color(
-                                        "WandrSecondary"
+                                .padding(12)
+                                .frame(maxWidth: .infinity)
+                                .background(Color.white)
+                                .clipShape(
+                                    RoundedRectangle(
+                                        cornerRadius: 18
                                     )
                                 )
-                            }
-                            .padding(12)
-                            .background(
-                                Color.white
-                            )
-                            .clipShape(
-                                RoundedRectangle(
-                                    cornerRadius: 18
+                                .contentShape(
+                                    RoundedRectangle(cornerRadius: 18)
                                 )
-                            )
+                                .onTapGesture {
+                                    selectedQuest = quest
+                                }
+                            }
+                            .buttonStyle(.plain)
                         }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 28)
+                        .padding(.bottom, 30)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 28)
-                    .padding(.bottom, 30)
                 }
             }
-
-        
+            .background(
+                Color("WandrBackground")
+            )
+            .sheet(item: $selectedQuest) { quest in
+                ExploreQuestDetailsView(
+                    quest: quest,
+                    isSaved: savedQuestIds.contains(quest.id),
+                    onSave: { quest, isSaved in
+                        if isSaved {
+                            savedQuestIds.insert(quest.id)
+                        } else {
+                            savedQuestIds.remove(quest.id)
+                        }
+                    }
+                )
+            }
         }
-        .background(
-            Color("WandrBackground")
+    }
+        
+        private func iconForCategory(
+            _ category: String
+        ) -> String {
+            
+            switch category.lowercased() {
+                
+            case "outdoor":
+                return "figure.hiking"
+                
+            case "food":
+                return "fork.knife"
+                
+            case "culture", "art":
+                return "paintpalette"
+                
+            case "music":
+                return "music.note"
+                
+            case "games":
+                return "gamecontroller"
+                
+            default:
+                return "sparkles"
+            }
+        }
+    }
+    
+    #Preview {
+        
+        RecommendedQuestsView(
+            quests: [],
+            savedQuestIds: .constant([]),
+            selectedTab: .constant(.home)
         )
     }
 
-    private func iconForCategory(
-        _ category: String
-    ) -> String {
-
-        switch category.lowercased() {
-
-        case "outdoor":
-            return "figure.hiking"
-
-        case "food":
-            return "fork.knife"
-
-        case "culture", "art":
-            return "paintpalette"
-
-        case "music":
-            return "music.note"
-
-        case "games":
-            return "gamecontroller"
-
-        default:
-            return "sparkles"
-        }
-    }
-}
-
-#Preview {
-
-    RecommendedQuestsView(
-        quests: [],
-        savedQuestIds: .constant([]),
-        selectedTab: .constant(.home)
-    )
-}

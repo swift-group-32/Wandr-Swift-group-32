@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
 
     @State private var selectedTab: AppTab
+    @State private var selectedExploreCategory = "All"
 
     init(initialTab: AppTab = .home) {
         _selectedTab = State(initialValue: initialTab)
@@ -12,7 +13,7 @@ struct ContentView: View {
 
         TabView(selection: $selectedTab) {
 
-            HomeView(selectedTab: $selectedTab)
+            HomeView(selectedTab: $selectedTab ,selectedExploreCategory: $selectedExploreCategory)
             .tabItem {
                 Label(
                     "Home",
@@ -25,7 +26,7 @@ struct ContentView: View {
                 selectedTab: $selectedTab,
                 savedQuestIds: .constant([]),
                 savedEventIds: .constant([]),
-                selectedCategory: .constant("All")
+                selectedCategory: $selectedExploreCategory
             )
             .tabItem {
                 Label(

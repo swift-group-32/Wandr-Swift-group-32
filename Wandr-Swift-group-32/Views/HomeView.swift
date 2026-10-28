@@ -9,12 +9,14 @@ struct HomeView: View {
 
 
     @Binding var selectedTab: AppTab
+    
+    @Binding var selectedExploreCategory: String
 
     @State private var savedQuestIds: Set<String> = []
 
     @State private var showRecommendedQuests = false
-
-    @State private var selectedExploreCategory = "All"
+    
+    @State private var selectedQuest: Quest?
 
     @State private var savedEventIds: Set<String> = []
 
@@ -979,7 +981,7 @@ struct HomeView: View {
                                                 )
 
                                         ) {
-
+                                            selectedQuest = quest
                                         }
 
                                     }
@@ -1231,8 +1233,17 @@ struct HomeView: View {
 
 
                                 Button {
-
-                                } label: {
+                                        selectedQuest = Quest(
+                                            id: quest.id,
+                                            title: quest.title,
+                                            category: "Nearby",
+                                            description: "Explore this nearby quest at \(quest.location).",
+                                            duration: quest.duration,
+                                            rating: 0.0,
+                                            isCompleted: false,
+                                            isSaved: savedQuestIds.contains(quest.id)
+                                        )
+                                    } label: {
 
 
 
@@ -1477,6 +1488,20 @@ struct HomeView: View {
 
             )
 
+        }
+        
+        .sheet(item: $selectedQuest) { quest in
+            ExploreQuestDetailsView(
+                quest: quest,
+                isSaved: savedQuestIds.contains(quest.id),
+                onSave: { quest, isSaved in
+                    if isSaved {
+                        savedQuestIds.insert(quest.id)
+                    } else {
+                        savedQuestIds.remove(quest.id)
+                    }
+                }
+            )
         }
 
 
@@ -1914,7 +1939,8 @@ struct RecommendedQuestCard: View {
 #Preview {
 
     HomeView(
-            selectedTab: .constant(.home)
+            selectedTab: .constant(.home),
+            selectedExploreCategory: .constant("All")
         )
 
 }
