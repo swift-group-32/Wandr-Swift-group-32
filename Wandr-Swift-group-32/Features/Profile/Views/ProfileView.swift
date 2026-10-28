@@ -1,11 +1,19 @@
 import SwiftUI
 import Charts
+import PhotosUI
 
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
     let userId: String
 
     let dayLetters = ["M", "T", "W", "T", "F", "S", "S"]
+
+    // Photo the user picks from their gallery
+    @State private var selectedPhoto: PhotosPickerItem? = nil
+    // Menu that opens when tapping the avatar
+    @State private var showPhotoOptions = false
+    // Gallery
+    @State private var showPhotoPicker = false
 
     var body: some View {
         NavigationStack {
@@ -28,15 +36,35 @@ struct ProfileView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.wandrCream)
             .navigationTitle("Profile")
+            .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhoto, matching: .images)
+            .onChange(of: selectedPhoto) { _, newItem in
+                guard let newItem = newItem else { return }
+                Task {
+                    if let data = try? await newItem.loadTransferable(type: Data.self) {
+                        await viewModel.changePhoto(imageData: data)
+                    }
+                    selectedPhoto = nil
+                }
+            }
+            .alert("Something went wrong", isPresented: Binding(
+                get: { viewModel.photoError != nil },
+                set: { if !$0 { viewModel.photoError = nil } }
+            )) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(viewModel.photoError ?? "")
+            }
         }
         .task {
             await viewModel.loadStreak(userId: userId)
+            await viewModel.loadUser()
         }
     }
 
     func content(_ profile: StreakDTO) -> some View {
         ScrollView {
             VStack(spacing: 16) {
+                profileHeader(profile)
                 levelCard()
                 weekCard(profile)
                 trendCard(profile)
@@ -46,7 +74,92 @@ struct ProfileView: View {
         }
     }
 
+    // 0. Photo, name, level and latest badge.
+    // Tapping the photo opens a menu to change or remove it.
+    func profileHeader(_ profile: StreakDTO) -> some View {
+        HStack(spacing: 16) {
+            Button {
+                showPhotoOptions = true
+            } label: {
+                avatarImage()
+                    .frame(width: 72, height: 72)
+                    .clipShape(Circle())
+                    .overlay {
+                        // While the photo uploads, a spinner covers the avatar
+                        if viewModel.isUploadingPhoto {
+                            Circle().fill(Color.black.opacity(0.35))
+                            ProgressView().tint(.white)
+                        }
+                    }
+            }
+            .buttonStyle(.plain)
+            .disabled(viewModel.isUploadingPhoto)
+            .confirmationDialog("Profile photo", isPresented: $showPhotoOptions) {
+                Button("Choose from library") {
+                    showPhotoPicker = true
+                }
+                if viewModel.photoURL != nil {
+                    Button("Remove photo", role: .destructive) {
+                        Task { await viewModel.removePhoto() }
+                    }
+                }
+                Button("Cancel", role: .cancel) { }
+            }
 
+            VStack(alignment: .leading, spacing: 6) {
+                Text(viewModel.user?.name ?? "Explorer")
+                    .font(.title3).bold()
+                    .foregroundColor(.wandrGreen)
+
+                Text("Level \(profile.stats.level)")
+                    .font(.caption).bold()
+                    .foregroundColor(.wandrGreen)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.wandrSage.opacity(0.15))
+                    .cornerRadius(8)
+
+                if let badge = viewModel.latestBadge {
+                    Label("\(badge.name) · \(badge.earnedOn ?? "")", systemImage: "trophy.fill")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                } else {
+                    Label("No badges yet", systemImage: "trophy")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+            }
+
+            Spacer()
+        }
+        .cardStyle()
+    }
+
+    // The user's photo if they have one; if not, their bear avatar
+    @ViewBuilder
+    func avatarImage() -> some View {
+        if let url = viewModel.photoURL {
+            AsyncImage(url: url) { phase in
+                if let image = phase.image {
+                    image.resizable().scaledToFill()
+                } else if phase.error != nil {
+                    defaultAvatar()
+                } else {
+                    ProgressView()
+                }
+            }
+        } else {
+            defaultAvatar()
+        }
+    }
+
+    func defaultAvatar() -> some View {
+        Image(viewModel.defaultAvatarName)
+            .resizable()
+            .scaledToFill()
+    }
+
+    // 1. Next milestone: progress to the next level
     func levelCard() -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
