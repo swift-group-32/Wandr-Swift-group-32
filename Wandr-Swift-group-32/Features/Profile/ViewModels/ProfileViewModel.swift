@@ -5,6 +5,7 @@ import CoreLocation
 @MainActor
 class ProfileViewModel: ObservableObject {
 
+    //Streak view
     @Published var profile: StreakDTO? = nil
     @Published var isLoading = false
     @Published var errorMessage: String? = nil
@@ -95,5 +96,84 @@ class ProfileViewModel: ObservableObject {
             return "Unlocked \(achievement.earnedOn ?? "")"
         }
         return achievement.description ?? "Keep exploring to unlock it"
+    }
+    
+    // Profile photo
+    @Published var user: UserProfileDTO? = nil
+    @Published var isUploadingPhoto = false
+    @Published var photoError: String? = nil
+
+    private let photoService = ProfilePhotoService()
+
+    func loadUser() async {
+        do {
+            user = try await photoService.fetchUser()
+        } catch {
+            print("User error:", error)
+        }
+    }
+
+    func changePhoto(imageData: Data) async {
+        isUploadingPhoto = true
+        photoError = nil
+        do {
+            let link = try await photoService.uploadPhoto(imageData: imageData)
+            user?.profilePicture = link
+        } catch {
+            print("Photo error:", error)
+            photoError = "Could not upload your photo. Try again."
+        }
+        isUploadingPhoto = false
+    }
+
+    func removePhoto() async {
+        isUploadingPhoto = true
+        photoError = nil
+        do {
+            try await photoService.removePhoto()
+            user?.profilePicture = nil
+        } catch {
+            print("Photo error:", error)
+            photoError = "Could not remove your photo. Try again."
+        }
+        isUploadingPhoto = false
+    }
+
+    var photoURL: URL? {
+        guard let picture = user?.profilePicture, !picture.isEmpty else { return nil }
+        return URL(string: picture)
+    }
+
+
+    var defaultAvatarName: String {
+        let id = user?.id ?? ""
+        let total = id.unicodeScalars.reduce(0) { $0 + Int($1.value) }
+        return "Avatar\(total % 3 + 1)"
+    }
+    
+    // Lastest badge
+    var latestBadge: Achievement? {
+        let unlocked = profile?.achievements.filter { $0.unlocked } ?? []
+        return unlocked.max { earnedDate($0) < earnedDate($1) }
+    }
+
+
+    private func earnedDate(_ achievement: Achievement) -> Date {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "MMM dd"
+
+        guard let text = achievement.earnedOn,
+              let parsed = formatter.date(from: text) else { return .distantPast }
+
+        let calendar = Calendar.current
+        var parts = calendar.dateComponents([.month, .day], from: parsed)
+        parts.year = calendar.component(.year, from: Date())
+
+        guard var date = calendar.date(from: parts) else { return .distantPast }
+        if date > Date() {
+            date = calendar.date(byAdding: .year, value: -1, to: date) ?? date
+        }
+        return date
     }
 }
