@@ -126,6 +126,7 @@ struct NotificationView: View {
         .task {
             await viewModel.loadNotifications()
         }
+        
     }
 
     private func notificationTitle(
