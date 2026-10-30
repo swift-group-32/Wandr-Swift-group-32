@@ -1,4 +1,3 @@
-
 import SwiftUI
 
 @main
@@ -11,10 +10,10 @@ struct Wandr_Swift_group_32App: App {
             } else if ProcessInfo.processInfo.arguments.contains("--open-map") {
                 ContentView(initialTab: .map)
             } else {
-                ContentView()
+                RootView()
             }
             #else
-            ContentView()
+            RootView()
             #endif
         }
     }
