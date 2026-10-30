@@ -25,13 +25,3 @@ struct SponsoredQuest {
     let category: String
 }
 
-struct BQ13Result {
-    let users: [ActiveUser]
-    let recommendedNotification: NotificationChannel
-}
-
-enum NotificationChannel: String {
-    case email
-    case inApp
-    case push
-}
