@@ -5,9 +5,9 @@ import Foundation
 enum AuthRules {
 
     static let maxNameLength = 40
-    static let maxEmailLength = 100
+    static let maxEmailLength = 50
     static let minPasswordLength = 8
-    static let maxPasswordLength = 64
+    static let maxPasswordLength = 15
     static let codeLength = 8
 
 

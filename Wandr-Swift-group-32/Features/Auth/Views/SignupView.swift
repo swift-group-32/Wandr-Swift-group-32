@@ -39,7 +39,7 @@ struct SignUpView: View {
                     PasswordField(placeholder: "Confirm password", text: $auth.confirmPassword, contentType: .newPassword)
 
                     
-                    Text("At least \(AuthRules.minPasswordLength) characters, with a letter and a number.")
+                    Text("\(AuthRules.minPasswordLength) to \(AuthRules.maxPasswordLength) characters, with a letter and a number.")
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
