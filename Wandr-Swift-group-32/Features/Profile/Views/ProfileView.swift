@@ -4,19 +4,18 @@ import PhotosUI
 
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
-    // Shared session (comes from RootView), used to log out
+    
     @EnvironmentObject var auth: AuthViewModel
     let userId: String
 
     let dayLetters = ["M", "T", "W", "T", "F", "S", "S"]
 
-    // Photo the user picks from their gallery
     @State private var selectedPhoto: PhotosPickerItem? = nil
-    // Menu that opens when tapping the avatar
+    
     @State private var showPhotoOptions = false
-    // Gallery
+    
     @State private var showPhotoPicker = false
-    // "Are you sure?" before logging out
+    
     @State private var showLogOutConfirm = false
 
     var body: some View {
@@ -77,45 +76,19 @@ struct ProfileView: View {
         ScrollView {
             VStack(spacing: 16) {
                 profileHeader(profile)
+                ProfileCompletionCard(hasPhoto: viewModel.photoURL != nil)
                 levelCard()
                 weekCard(profile)
                 trendCard(profile)
                 achievementsSection(profile)
-                NavigationLink {
-                    SponsoredQuestView()
-                } label: {
-                    HStack {
-                        Image(systemName: "megaphone.fill")
-                            .foregroundStyle(Color.wandrGreen)
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Sponsored Quest Opportunities")
-                                .font(.headline)
-
-                            Text("Find users for sponsored quests")
-                                .font(.caption)
-                                .foregroundStyle(.gray)
-                        }
-
-                        Spacer()
-
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(.gray)
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.white)
-                    .cornerRadius(16)
-                }
-
+                insightsLink()
                 logOutButton()
+                
             }
             .padding()
         }
     }
 
-    // 0. Photo, name, level and latest badge.
-    // Tapping the photo opens a menu to change or remove it.
     func profileHeader(_ profile: StreakDTO) -> some View {
         HStack(spacing: 16) {
             Button {
@@ -175,7 +148,7 @@ struct ProfileView: View {
         .cardStyle()
     }
 
-    // The user's photo if they have one; if not, their bear avatar
+    // The user's photo if they have one if not, their bear avatar
     @ViewBuilder
     func avatarImage() -> some View {
         if let url = viewModel.photoURL {
@@ -387,7 +360,34 @@ struct ProfileView: View {
         .cornerRadius(16)
     }
 
-    // Last item of the screen
+    // BQ9
+    func insightsLink() -> some View {
+        NavigationLink {
+            ActivityInsightsView()
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "chart.bar.xaxis")
+                    .foregroundColor(.wandrGreen)
+                    .frame(width: 40, height: 40)
+                    .background(Color.wandrSage.opacity(0.15))
+                    .clipShape(Circle())
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Activity insights")
+                        .font(.subheadline).bold()
+                        .foregroundColor(.wandrGreen)
+                    Text("What inactive users have in common")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.gray)
+            }
+            .cardStyle()
+        }
+        .buttonStyle(.plain)
+    }
+
     func logOutButton() -> some View {
         Button {
             showLogOutConfirm = true
