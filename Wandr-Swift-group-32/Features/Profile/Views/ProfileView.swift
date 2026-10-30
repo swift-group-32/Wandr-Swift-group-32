@@ -81,6 +81,33 @@ struct ProfileView: View {
                 weekCard(profile)
                 trendCard(profile)
                 achievementsSection(profile)
+                NavigationLink {
+                    SponsoredQuestView()
+                } label: {
+                    HStack {
+                        Image(systemName: "megaphone.fill")
+                            .foregroundStyle(Color.wandrGreen)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Sponsored Quest Opportunities")
+                                .font(.headline)
+
+                            Text("Find users for sponsored quests")
+                                .font(.caption)
+                                .foregroundStyle(.gray)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(.gray)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.white)
+                    .cornerRadius(16)
+                }
+
                 logOutButton()
             }
             .padding()

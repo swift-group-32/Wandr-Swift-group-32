@@ -21,8 +21,10 @@ struct HomeView: View {
     @State private var savedEventIds: Set<String> = []
 
     @State private var userName = "User"
+    
+    @State private var showNotifications = false
 
-
+    @State private var hasUnreadNotifications = false
 
     @State private var nearbyQuests: [NearbyQuest] = []
 
@@ -138,6 +140,28 @@ struct HomeView: View {
             }
 
         }
+        
+        .sheet(isPresented: $showNotifications) {
+            NavigationStack {
+                NotificationView()
+            }
+        }
+        .onChange(of: showNotifications) { _, isShowing in
+            if !isShowing {
+                Task {
+                    do {
+                        let repository = SupabaseNotificationRepository()
+                        let notifications = try await repository.fetchNotifications()
+
+                        hasUnreadNotifications = notifications.contains {
+                            !$0.readStatus
+                        }
+                    } catch {
+                        print("Could not refresh notifications:", error)
+                    }
+                }
+            }
+        }
 
     }
 
@@ -222,27 +246,25 @@ struct HomeView: View {
 
 
                             Button {
-
-                                // Notifications
-
+                                showNotifications = true
                             } label: {
+                                ZStack(alignment: .topTrailing) {
 
+                                    Image(systemName: "bell")
+                                        .font(.title3)
+                                        .foregroundStyle(Color.wandrGreen)
 
-
-                                Image(
-
-                                    systemName: "bell"
-
-                                )
-
-                                .font(.title2)
-
-                                .foregroundStyle(
-
-                                    Color("WandrPrimary")
-
-                                )
-
+                                    if hasUnreadNotifications {
+                                        Circle()
+                                            .fill(Color.red)
+                                            .frame(width: 10, height: 10)
+                                            .overlay {
+                                                Circle()
+                                                    .stroke(Color.white, lineWidth: 1.5)
+                                            }
+                                            .offset(x: 4, y: -4)
+                                    }
+                                }
                             }
 
 
@@ -1533,7 +1555,13 @@ struct HomeView: View {
 
                 await loadNearbyQuests()
 
+                let notificationRepository = SupabaseNotificationRepository()
 
+                let notifications = try await notificationRepository.fetchNotifications()
+
+                hasUnreadNotifications = notifications.contains {
+                    !$0.readStatus
+                }
 
             } catch {
 
