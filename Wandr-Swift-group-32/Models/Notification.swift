@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AppNotification: Identifiable, Decodable {
+struct AppNotification: Identifiable, Codable {
     let id: UUID
     let type: String
     let content: String?

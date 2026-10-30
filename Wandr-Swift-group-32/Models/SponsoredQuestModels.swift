@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ActiveUser {
+struct ActiveUser: Codable  {
     let userId: String
     let name: String
     let completedQuests: Int
@@ -15,7 +15,7 @@ struct ActiveUser {
     let sponsoredQuest: SponsoredQuest?
 }
 
-struct SponsoredQuest {
+struct SponsoredQuest: Codable {
     let id: UUID
     let title: String
     let description: String

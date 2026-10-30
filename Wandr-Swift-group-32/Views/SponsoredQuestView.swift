@@ -13,6 +13,7 @@ struct SponsoredQuestView: View {
         SponsoredQuestViewModel(
             repository: SupabaseSponsoredQuestRepository()
         )
+    @StateObject private var connectivity = ConnectivityMonitor.shared
 
     @State private var selectedQuest: Quest?
 
@@ -219,6 +220,13 @@ struct SponsoredQuestView: View {
         .navigationBarTitleDisplayMode(.large)
         .task {
             await viewModel.loadCurrentUser()
+        }
+        .onChange(of: connectivity.isConnected) { _, connected in
+            if connected {
+                Task {
+                    await viewModel.loadCurrentUser()
+                }
+            }
         }
         .sheet(item: $selectedQuest) { quest in
             ExploreQuestDetailsView(

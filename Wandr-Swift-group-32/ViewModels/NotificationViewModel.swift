@@ -16,6 +16,7 @@ final class NotificationViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private let repository: NotificationRepository
+    private let localStorage = NotificationLocalStorage.shared
 
     init(repository: NotificationRepository) {
         self.repository = repository
@@ -24,6 +25,21 @@ final class NotificationViewModel: ObservableObject {
     func loadNotifications() async {
         isLoading = true
         errorMessage = nil
+        
+        if let cached = await localStorage.loadMemoryCache() {
+            notifications = cached
+            isLoading = false
+            print("Using memory cache:", cached.count)
+            return
+        }
+        
+        if let stored = try? await localStorage.load(),
+           !stored.isEmpty {
+            notifications = stored
+            isLoading = false
+            print("Using UserDefaults:", stored.count)
+            return
+        }
 
         do {
             notifications = try await repository.fetchNotifications()
@@ -39,6 +55,8 @@ final class NotificationViewModel: ObservableObject {
                     createdAt: notification.createdAt
                 )
             }
+            
+            try await localStorage.save(notifications)
 
         } catch {
             errorMessage = error.localizedDescription
@@ -46,4 +64,5 @@ final class NotificationViewModel: ObservableObject {
 
         isLoading = false
     }
+    
 }

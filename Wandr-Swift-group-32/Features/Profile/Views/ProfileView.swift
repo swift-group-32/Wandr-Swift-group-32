@@ -20,19 +20,64 @@ struct ProfileView: View {
 
     var body: some View {
         NavigationStack {
+
             Group {
+
                 if viewModel.isLoading {
+
                     ProgressView("Loading your streak...")
+
                 } else if let error = viewModel.errorMessage {
+
                     VStack(spacing: 12) {
+
                         Text(error)
+
                         Button("Retry") {
-                            Task { await viewModel.loadStreak(userId: userId) }
+                            Task {
+                                await viewModel.loadStreak(userId: userId)
+                            }
+                        }
+
+                        NavigationLink {
+                            SponsoredQuestView()
+                        } label: {
+                            HStack {
+
+                                Image(systemName: "megaphone.fill")
+                                    .foregroundStyle(Color.wandrGreen)
+
+                                VStack(
+                                    alignment: .leading,
+                                    spacing: 4
+                                ) {
+
+                                    Text("Sponsored Quest Opportunities")
+                                        .font(.headline)
+
+                                    Text("Find users for sponsored quests")
+                                        .font(.caption)
+                                        .foregroundStyle(.gray)
+                                }
+
+                                Spacer()
+
+                                Image(systemName: "chevron.right")
+                                    .foregroundStyle(.gray)
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.white)
+                            .cornerRadius(16)
                         }
                     }
+
                 } else if let profile = viewModel.profile {
+
                     content(profile)
+
                 } else {
+
                     Text("No activity yet. Complete your first quest!")
                 }
             }
