@@ -20,7 +20,7 @@ class StreakService {
         //  )
         //}
         
-        try await signInTestUserIfNeeded()
+        try await requireSession()
 
         
         let response = try await supabase

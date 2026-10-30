@@ -792,14 +792,7 @@ struct HomeView: View {
 
                                             do {
 
-                                                try await SupabaseManager
-
-                                                    .shared
-
-                                                    .signInForTesting()
-
-
-
+                                                
                                                 userName =
 
                                                     await SupabaseManager.shared
@@ -1488,12 +1481,6 @@ struct HomeView: View {
         .task {
 
             do {
-
-
-
-                try await SupabaseManager.shared
-
-                    .signInForTesting()
 
 
 

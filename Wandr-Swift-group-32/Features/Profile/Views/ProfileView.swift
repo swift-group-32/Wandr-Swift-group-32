@@ -4,6 +4,8 @@ import PhotosUI
 
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
+    // Shared session (comes from RootView), used to log out
+    @EnvironmentObject var auth: AuthViewModel
     let userId: String
 
     let dayLetters = ["M", "T", "W", "T", "F", "S", "S"]
@@ -14,6 +16,8 @@ struct ProfileView: View {
     @State private var showPhotoOptions = false
     // Gallery
     @State private var showPhotoPicker = false
+    // "Are you sure?" before logging out
+    @State private var showLogOutConfirm = false
 
     var body: some View {
         NavigationStack {
@@ -46,6 +50,14 @@ struct ProfileView: View {
                     selectedPhoto = nil
                 }
             }
+            .alert("Log out?", isPresented: $showLogOutConfirm) {
+                Button("Cancel", role: .cancel) { }
+                Button("Log out", role: .destructive) {
+                    Task { await auth.logOut() }
+                }
+            } message: {
+                Text("You will need your email and password to come back.")
+            }
             .alert("Something went wrong", isPresented: Binding(
                 get: { viewModel.photoError != nil },
                 set: { if !$0 { viewModel.photoError = nil } }
@@ -69,6 +81,7 @@ struct ProfileView: View {
                 weekCard(profile)
                 trendCard(profile)
                 achievementsSection(profile)
+                logOutButton()
             }
             .padding()
         }
@@ -346,8 +359,24 @@ struct ProfileView: View {
         .background(achievement.unlocked ? Color.white : Color.gray.opacity(0.08))
         .cornerRadius(16)
     }
+
+    // Last item of the screen
+    func logOutButton() -> some View {
+        Button {
+            showLogOutConfirm = true
+        } label: {
+            Label("Log out", systemImage: "rectangle.portrait.and.arrow.right")
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.red.opacity(0.1))
+                .foregroundColor(.red)
+                .cornerRadius(12)
+        }
+        .padding(.top, 8)
+    }
 }
 
 #Preview {
     ProfileView(userId: "123")
+        .environmentObject(AuthViewModel())
 }

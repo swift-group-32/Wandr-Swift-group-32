@@ -17,7 +17,7 @@ struct ReviewService: ReviewSubmitting {
 
     func submit(_ draft: ReviewDraft, photos: [ReviewPhoto]) async throws -> ReviewSubmissionResult {
         guard let questId = UUID(uuidString: draft.context.questId) else { throw SubmissionError.preview }
-        try await signInTestUserIfNeeded()
+        try await requireSession()
         let userId = try await supabase.auth.session.user.id.uuidString.lowercased()
         // Check before uploading: a retry after a lost success response must not overwrite
         // photos already referenced by an immutable submitted review.

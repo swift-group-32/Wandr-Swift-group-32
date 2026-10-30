@@ -20,7 +20,7 @@ class ActiveQuestService: ActiveQuestServing {
     let useMockData = false
 
     func fetchStartableQuests() async throws -> [StartableQuestDTO] {
-        try await signInTestUserIfNeeded()
+        try await requireSession()
         let userId = try await supabase.auth.session.user.id
         let catalog = try await supabase.from("quests")
             .select("id, title, estimated_duration, place:places(name)")
@@ -37,7 +37,7 @@ class ActiveQuestService: ActiveQuestServing {
     }
 
     func startQuest(questId: String) async throws {
-        try await signInTestUserIfNeeded()
+        try await requireSession()
         try await supabase.rpc("start_quest", params: ["p_quest_id": questId]).execute()
     }
 
@@ -46,7 +46,7 @@ class ActiveQuestService: ActiveQuestServing {
             return ActiveQuestDTO.mock
         }
 
-        try await signInTestUserIfNeeded()
+        try await requireSession()
         let userId = try await supabase.auth.session.user.id
 
 

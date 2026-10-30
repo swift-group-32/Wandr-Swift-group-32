@@ -7,7 +7,7 @@ class ProfilePhotoService {
 
 
     func fetchUser() async throws -> UserProfileDTO {
-        try await signInTestUserIfNeeded()
+        try await requireSession()
         let userId = try await supabase.auth.session.user.id
 
         let response = try await supabase

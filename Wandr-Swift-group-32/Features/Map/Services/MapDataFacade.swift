@@ -68,7 +68,7 @@ final class SupabaseMapRemote: MapRemoteProviding {
     private var authenticationTask: Task<Void, Error>?
 
     init(client: SupabaseClient = supabase,
-         prepareSession: @escaping @MainActor () async throws -> Void = { try await signInTestUserIfNeeded() }) {
+         prepareSession: @escaping @MainActor () async throws -> Void = { try await requireSession() }) {
         self.client = client
         self.prepareSession = prepareSession
     }
