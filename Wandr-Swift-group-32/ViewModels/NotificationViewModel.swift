@@ -26,40 +26,50 @@ final class NotificationViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         
-        if let cached = await localStorage.loadMemoryCache() {
-            notifications = cached
-            isLoading = false
-            print("Using memory cache:", cached.count)
-            return
-        }
+        var loadedNotifications: [AppNotification] = []
         
-        if let stored = try? await localStorage.load(),
-           !stored.isEmpty {
-            notifications = stored
-            isLoading = false
-            print("Using UserDefaults:", stored.count)
-            return
-        }
+        if let cached = await localStorage.loadMemoryCache() {
+                    loadedNotifications = cached
+                    print("Using memory cache:", cached.count)
 
-        do {
-            notifications = try await repository.fetchNotifications()
+                } else if let stored = try? await localStorage.load(),
+                          !stored.isEmpty {
+                    loadedNotifications = stored
+                    print("Using UserDefaults:", stored.count)
 
-            try await repository.markAllAsRead()
+                } else {
+                    do {
+                        loadedNotifications = try await repository.fetchNotifications()
+                        print("Loaded from Supabase:", loadedNotifications.count)
+                    } catch {
+                        errorMessage = error.localizedDescription
+                        isLoading = false
+                        return
+                    }
+                }
 
-            notifications = notifications.map { notification in
-                AppNotification(
-                    id: notification.id,
-                    type: notification.type,
-                    content: notification.content,
-                    readStatus: true,
-                    createdAt: notification.createdAt
-                )
-            }
-            
-            try await localStorage.save(notifications)
+                notifications = loadedNotifications
+
+                do {
+                    try await repository.markAllAsRead()
+
+                    notifications = loadedNotifications.map { notification in
+                        AppNotification(
+                            id: notification.id,
+                            type: notification.type,
+                            content: notification.content,
+                            readStatus: true,
+                            createdAt: notification.createdAt
+                        )
+                    }
+
+                    try await localStorage.save(notifications)
+
+                    print("Notifications marked as read and cache updated")
+
 
         } catch {
-            errorMessage = error.localizedDescription
+            print("Could not mark notifications as read:", error.localizedDescription)
         }
 
         isLoading = false
