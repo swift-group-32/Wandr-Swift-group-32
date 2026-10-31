@@ -172,6 +172,8 @@ class AuthViewModel: ObservableObject {
         } catch {
             print("Log out error:", error)
         }
+        do { try BusinessInsightsStorage.shared.clearAll() }
+        catch { print("Could not clear business reports:", error) }
         name = ""
         password = ""
         confirmPassword = ""

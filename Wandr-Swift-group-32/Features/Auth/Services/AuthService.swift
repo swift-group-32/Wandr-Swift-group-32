@@ -6,11 +6,16 @@ import Supabase
 class AuthService {
 
     func hasSession() async -> Bool {
+        // An existing account can open local reports offline, even if its token needs refresh.
+        // Network operations still obtain a valid session through Supabase.
+        if !NetworkMonitor.shared.isConnected {
+            return supabase.auth.currentSession != nil
+        }
         do {
             _ = try await supabase.auth.session
             return true
         } catch {
-            return false
+            return !NetworkMonitor.shared.isConnected && supabase.auth.currentSession != nil
         }
     }
 

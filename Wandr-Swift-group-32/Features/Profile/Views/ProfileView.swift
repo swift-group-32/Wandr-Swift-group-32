@@ -84,6 +84,17 @@ struct ProfileView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.wandrCream)
             .navigationTitle("Profile")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        BusinessInsightsView()
+                    } label: {
+                        Label("Business Insights", systemImage: "briefcase")
+                            .labelStyle(.titleAndIcon)
+                    }
+                    .accessibilityIdentifier("businessInsightsLink")
+                }
+            }
             .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhoto, matching: .images)
             .onChange(of: selectedPhoto) { _, newItem in
                 guard let newItem = newItem else { return }
