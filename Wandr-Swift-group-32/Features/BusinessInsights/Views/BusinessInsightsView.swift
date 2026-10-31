@@ -2,6 +2,7 @@ import SwiftUI
 
 struct BusinessInsightsView: View {
     @StateObject private var viewModel: BusinessInsightsViewModel
+    @ObservedObject private var network = NetworkMonitor.shared
 
     init(viewModel: BusinessInsightsViewModel? = nil) {
         _viewModel = StateObject(wrappedValue: viewModel ?? BusinessInsightsViewModel())
@@ -10,6 +11,12 @@ struct BusinessInsightsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                if let notice = viewModel.notice {
+                    Label(notice, systemImage: network.isConnected ? "clock" : "wifi.slash")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("businessSavedReportNotice")
+                }
                 if let error = viewModel.errorMessage {
                     Label(error, systemImage: "exclamationmark.circle")
                         .font(.subheadline)
@@ -34,7 +41,7 @@ struct BusinessInsightsView: View {
                         .frame(maxWidth: .infinity)
                 } else if viewModel.access != .inactive {
                     Button("Refresh report", systemImage: "arrow.clockwise") {
-                        Task { await viewModel.load() }
+                        Task { await viewModel.load(forceRefresh: true, isConnected: network.isConnected) }
                     }
                     .buttonStyle(.bordered)
                 }
@@ -45,8 +52,12 @@ struct BusinessInsightsView: View {
         .tint(.wandrGreen)
         .navigationTitle("Business Insights")
         .navigationBarTitleDisplayMode(.inline)
-        .task { await viewModel.load() }
-        .refreshable { await viewModel.load() }
+        .task { await viewModel.appear(isConnected: network.isConnected) }
+        .onDisappear { viewModel.disappear() }
+        .onChange(of: network.isConnected) { _, connected in
+            Task { await viewModel.connectivityChanged(isConnected: connected) }
+        }
+        .refreshable { await viewModel.load(forceRefresh: true, isConnected: network.isConnected) }
     }
 
     private var activationCard: some View {
@@ -64,10 +75,10 @@ struct BusinessInsightsView: View {
                 .textFieldStyle(.roundedBorder)
                 .submitLabel(.go)
                 .accessibilityIdentifier("businessAccessCode")
-                .onSubmit { Task { await viewModel.activate() } }
+                .onSubmit { Task { await viewModel.activate(isConnected: network.isConnected) } }
                 .disabled(viewModel.isWorking)
             Button {
-                Task { await viewModel.activate() }
+                Task { await viewModel.activate(isConnected: network.isConnected) }
             } label: {
                 Text("Activate business access")
                     .frame(maxWidth: .infinity)

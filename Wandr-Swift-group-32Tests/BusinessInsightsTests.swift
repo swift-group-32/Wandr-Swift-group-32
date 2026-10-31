@@ -1,10 +1,13 @@
 import Foundation
 import Testing
+import SwiftData
 @testable import Wandr_Swift_group_32
 
 @MainActor
 struct BusinessInsightsTests {
     private final class Service: BusinessInsightsServing {
+        var currentAccountID: String? = "test-account"
+        var accessChecks = 0
         var hasAccess = false
         var accessError: Error?
         var activationError: Error?
@@ -13,6 +16,7 @@ struct BusinessInsightsTests {
         var activationCodes: [String] = []
 
         func hasBusinessAccess() async throws -> Bool {
+            accessChecks += 1
             if let accessError { throw accessError }
             return hasAccess
         }
@@ -30,20 +34,26 @@ struct BusinessInsightsTests {
         }
     }
 
-    @Test func normalUserSeesActivationWithoutRequestingTheReport() async {
+    private func makeModel(service: Service) throws -> BusinessInsightsViewModel {
+        let container = try ModelContainer(for: SavedBusinessReport.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        return BusinessInsightsViewModel(service: service, storage: BusinessInsightsStorage(container: container))
+    }
+
+    @Test func normalUserSeesActivationWithoutRequestingTheReport() async throws {
         let service = Service()
-        let model = BusinessInsightsViewModel(service: service)
-        await model.load()
+        let model = try makeModel(service: service)
+        await model.load(forceRefresh: true)
         #expect(model.access == .inactive)
         #expect(model.report == nil)
         #expect(service.reportCalls == 0)
         #expect(!model.isWorking)
     }
 
-    @Test func fourDigitActivationFetchesReportAndClearsCode() async {
+    @Test func fourDigitActivationFetchesReportAndClearsCode() async throws {
         let service = Service()
-        let model = BusinessInsightsViewModel(service: service)
-        await model.load()
+        let model = try makeModel(service: service)
+        await model.load(forceRefresh: true)
         model.accessCode = " 1234\n"
         await model.activate()
         #expect(service.activationCodes == ["1234"])
@@ -53,11 +63,11 @@ struct BusinessInsightsTests {
         #expect(model.errorMessage == nil)
     }
 
-    @Test func rejectedActivationDoesNotGrantAccessOrFetchReport() async {
+    @Test func rejectedActivationDoesNotGrantAccessOrFetchReport() async throws {
         let service = Service()
         service.activationError = BusinessInsightsError.invalidCode
-        let model = BusinessInsightsViewModel(service: service)
-        await model.load()
+        let model = try makeModel(service: service)
+        await model.load(forceRefresh: true)
         model.accessCode = "4321"
         await model.activate()
         #expect(model.access == .inactive)
@@ -67,82 +77,82 @@ struct BusinessInsightsTests {
         #expect(model.errorMessage?.contains("incorrect") == true)
     }
 
-    @Test func shortCodesAreRejectedBeforeMakingARequest() async {
+    @Test func shortCodesAreRejectedBeforeMakingARequest() async throws {
         let service = Service()
-        let model = BusinessInsightsViewModel(service: service)
+        let model = try makeModel(service: service)
         model.accessCode = "123"
         await model.activate()
         #expect(service.activationCodes.isEmpty)
         #expect(model.errorMessage != nil)
     }
 
-    @Test func existingBusinessAccountLoadsWithoutReenteringCode() async {
+    @Test func existingBusinessAccountLoadsWithoutReenteringCode() async throws {
         let service = Service()
         service.hasAccess = true
-        let model = BusinessInsightsViewModel(service: service)
-        await model.load()
+        let model = try makeModel(service: service)
+        await model.load(forceRefresh: true)
         #expect(model.report != nil)
         #expect(service.activationCodes.isEmpty)
     }
 
-    @Test func failedReportAfterActivationCanRetryWithoutAnotherCode() async {
+    @Test func failedReportAfterActivationCanRetryWithoutAnotherCode() async throws {
         let service = Service()
         service.reportError = BusinessInsightsError.offline
-        let model = BusinessInsightsViewModel(service: service)
-        await model.load()
+        let model = try makeModel(service: service)
+        await model.load(forceRefresh: true)
         model.accessCode = "1234"
         await model.activate()
         #expect(model.access == .active)
         #expect(model.report == nil)
         #expect(model.errorMessage != nil)
         service.reportError = nil
-        await model.load()
+        await model.load(forceRefresh: true)
         #expect(model.report != nil)
         #expect(service.activationCodes == ["1234"])
         #expect(model.errorMessage == nil)
     }
 
-    @Test func revokedAccessClearsPreviouslyVisibleReport() async {
+    @Test func revokedAccessClearsPreviouslyVisibleReport() async throws {
         let service = Service()
         service.hasAccess = true
-        let model = BusinessInsightsViewModel(service: service)
-        await model.load()
+        let model = try makeModel(service: service)
+        await model.load(forceRefresh: true)
         #expect(model.report != nil)
         // The role can be revoked between reading the profile and requesting the report.
         service.reportError = BusinessInsightsError.accessDenied
-        await model.load()
+        await model.load(forceRefresh: true)
         #expect(model.report == nil)
         #expect(model.access == .inactive)
     }
 
-    @Test func changedProfileFlagAlsoClearsReport() async {
+    @Test func changedProfileFlagAlsoClearsReport() async throws {
         let service = Service()
         service.hasAccess = true
-        let model = BusinessInsightsViewModel(service: service)
-        await model.load()
+        let model = try makeModel(service: service)
+        await model.load(forceRefresh: true)
         service.hasAccess = false
-        await model.load()
+        await model.load(forceRefresh: true)
         #expect(model.report == nil)
         #expect(model.access == .inactive)
         #expect(service.reportCalls == 1)
     }
 
-    @Test func expiredSessionDoesNotKeepBusinessDataOnScreen() async {
+    @Test func expiredSessionDoesNotKeepBusinessDataOnScreen() async throws {
         let service = Service()
         service.hasAccess = true
-        let model = BusinessInsightsViewModel(service: service)
-        await model.load()
+        let model = try makeModel(service: service)
+        await model.load(forceRefresh: true)
         service.accessError = BusinessInsightsError.signInRequired
-        await model.load()
+        await model.load(forceRefresh: true)
         #expect(model.report == nil)
         #expect(model.access == .unknown)
     }
 
-    @Test func cancellationDoesNotShowAnErrorOrStayLoading() async {
+    @Test func cancellationDoesNotShowAnErrorOrStayLoading() async throws {
         let service = Service()
         service.accessError = CancellationError()
-        let model = BusinessInsightsViewModel(service: service)
-        await model.load()
+        let model = try makeModel(service: service)
+        await model.load(forceRefresh: true)
         #expect(model.errorMessage == nil)
         #expect(!model.isWorking)
     }

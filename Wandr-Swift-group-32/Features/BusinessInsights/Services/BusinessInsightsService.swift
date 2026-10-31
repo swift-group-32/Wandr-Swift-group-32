@@ -3,6 +3,7 @@ import Supabase
 
 @MainActor
 protocol BusinessInsightsServing {
+    var currentAccountID: String? { get }
     func hasBusinessAccess() async throws -> Bool
     func activate(code: String) async throws
     func fetchReport() async throws -> CategoryEngagementReport
@@ -18,6 +19,10 @@ struct BusinessInsightsService: BusinessInsightsServing {
 
     init(client: SupabaseClient? = nil) {
         self.client = client ?? supabase
+    }
+
+    var currentAccountID: String? {
+        client.auth.currentSession?.user.id.uuidString.lowercased()
     }
 
     func hasBusinessAccess() async throws -> Bool {
@@ -44,7 +49,11 @@ struct BusinessInsightsService: BusinessInsightsServing {
         try await request {
             _ = try await client.auth.session
             let response = try await client.rpc("get_category_engagement").execute()
-            return try CategoryEngagementReport.decode(response.data)
+            let data = response.data
+            // Decode a Sendable value away from the main actor; UI and SwiftData stay on it.
+            return try await Task.detached(priority: .utility) {
+                try CategoryEngagementReport.decode(data)
+            }.value
         }
     }
 
