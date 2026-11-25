@@ -32,7 +32,7 @@ final class SponsoredQuestViewModel: ObservableObject {
         do {
             let userId = try await SupabaseManager.shared.client.auth.session.user.id.uuidString
 
-            if let cachedUser = cache.load(userId: userId) {
+            if let cachedUser = cache.loadUser(userId: userId) {
                 activeUser = cachedUser
                 isLoading = false
             }

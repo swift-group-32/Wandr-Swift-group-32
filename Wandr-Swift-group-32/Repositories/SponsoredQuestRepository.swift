@@ -25,18 +25,18 @@ final class SupabaseSponsoredQuestRepository: SponsoredQuestRepository {
         async let sponsoredAttempts = fetchSponsoredQuestAttempts(
             userId: userId
         )
-        async let sponsoredQuest = fetchActiveSponsoredQuest()
+        async let sponsoredQuests = fetchActiveSponsoredQuests()
 
         let (
             monthlyCompletions,
             userProfile,
             hasTriedSponsoredQuest,
-            availableSponsoredQuest
+            availableSponsoredQuests
         ) = try await (
             completions,
             user,
             sponsoredAttempts,
-            sponsoredQuest
+            sponsoredQuests
         )
 
         guard monthlyCompletions.count >= 5 else {
@@ -48,7 +48,7 @@ final class SupabaseSponsoredQuestRepository: SponsoredQuestRepository {
             name: userProfile.name,
             completedQuests: monthlyCompletions.count,
             hasTriedSponsoredQuest: hasTriedSponsoredQuest,
-            sponsoredQuest: availableSponsoredQuest
+            sponsoredQuests: availableSponsoredQuests
         )
     }
 
@@ -131,8 +131,8 @@ final class SupabaseSponsoredQuestRepository: SponsoredQuestRepository {
         return !attempts.isEmpty
     }
 
-    private func fetchActiveSponsoredQuest()
-    async throws -> SponsoredQuest? {
+    private func fetchActiveSponsoredQuests()
+    async throws -> [SponsoredQuest] {
 
         let response = try await supabase
             .from("sponsored_quests")
@@ -142,56 +142,60 @@ final class SupabaseSponsoredQuestRepository: SponsoredQuestRepository {
                 sponsor_name,
                 description
             """)
-            .limit(1)
             .execute()
 
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
 
-        let sponsoredQuests = try decoder.decode(
+        let sponsoredQuestResponses = try decoder.decode(
             [SponsoredQuestResponse].self,
             from: response.data
         )
 
-        guard let sponsoredQuest = sponsoredQuests.first else {
-            return nil
+        var sponsoredQuests: [SponsoredQuest] = []
+
+        for sponsoredQuest in sponsoredQuestResponses {
+
+            let questResponse = try await supabase
+                .from("quests")
+                .select("""
+                    title,
+                    description,
+                    estimated_duration,
+                    places (
+                        name,
+                        category,
+                        average_rating
+                    )
+                """)
+                .eq(
+                    "id",
+                    value: sponsoredQuest.questId
+                )
+                .single()
+                .execute()
+
+            let quest = try decoder.decode(
+                QuestResponse.self,
+                from: questResponse.data
+            )
+
+            let questData = SponsoredQuest(
+                id: sponsoredQuest.id,
+                title: quest.title,
+                description: quest.description
+                    ?? sponsoredQuest.description
+                    ?? "",
+                sponsorName: sponsoredQuest.sponsorName,
+                duration: quest.estimatedDuration ?? 0,
+                rating: quest.places?.averageRating ?? 0,
+                category: quest.places?.category ?? "other"
+            )
+
+            sponsoredQuests.append(questData)
         }
 
-        let questResponse = try await supabase
-            .from("quests")
-            .select("""
-                title,
-                description,
-                estimated_duration,
-                places (
-                    name,
-                    category,
-                    average_rating
-                )
-            """)
-            .eq(
-                "id",
-                value: sponsoredQuest.questId
-            )
-            .single()
-            .execute()
-
-        let quest = try decoder.decode(
-            QuestResponse.self,
-            from: questResponse.data
-        )
-
-        return SponsoredQuest(
-            id: sponsoredQuest.id,
-            title: quest.title,
-            description: quest.description
-                ?? sponsoredQuest.description
-                ?? "",
-            sponsorName: sponsoredQuest.sponsorName,
-            duration: quest.estimatedDuration ?? 0,
-            rating: quest.places?.averageRating ?? 0,
-            category: quest.places?.category ?? "other"
-        )
+        return sponsoredQuests
     }
 }
 

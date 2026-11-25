@@ -13,7 +13,7 @@ struct SponsoredQuestView: View {
         SponsoredQuestViewModel(
             repository: SupabaseSponsoredQuestRepository()
         )
-    @StateObject private var connectivity = ConnectivityMonitor.shared
+    @StateObject private var networkMonitor = NetworkMonitor.shared
 
     @State private var selectedQuest: Quest?
 
@@ -81,116 +81,111 @@ struct SponsoredQuestView: View {
                         )
 
                         if !user.hasTriedSponsoredQuest,
-                           let sponsoredQuest = user.sponsoredQuest {
+                           !user.sponsoredQuests.isEmpty {
 
                             VStack(
                                 alignment: .leading,
                                 spacing: 12
                             ) {
 
-                                HStack {
-                                    Image(
-                                        systemName: "megaphone.fill"
-                                    )
+                                Text("Sponsored for you")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
                                     .foregroundStyle(
                                         Color("WandrSecondary")
                                     )
 
-                                    Text("Sponsored for you")
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-                                        .foregroundStyle(
-                                            Color("WandrSecondary")
+                                ForEach(
+                                    user.sponsoredQuests,
+                                    id: \.id
+                                ) { sponsoredQuest in
+
+                                    Button {
+                                        selectedQuest = makeQuest(
+                                            from: sponsoredQuest
                                         )
+                                    } label: {
 
-                                    Spacer()
-                                }
+                                        HStack(spacing: 14) {
 
-                                Button {
-                                    selectedQuest = makeQuest(
-                                        from: sponsoredQuest
-                                    )
-                                } label: {
-
-                                    HStack(spacing: 14) {
-
-                                        ZStack {
-                                            RoundedRectangle(
-                                                cornerRadius: 14
-                                            )
-                                            .fill(
-                                                Color("WandrSecondary")
-                                            )
-
-                                            Image(
-                                                systemName: "music.note"
-                                            )
-                                            .font(.title2)
-                                            .foregroundStyle(.white)
-                                        }
-                                        .frame(
-                                            width: 64,
-                                            height: 64
-                                        )
-
-                                        VStack(
-                                            alignment: .leading,
-                                            spacing: 5
-                                        ) {
-
-                                            Text(
-                                                sponsoredQuest.title
-                                            )
-                                            .font(.subheadline)
-                                            .fontWeight(.semibold)
-                                            .foregroundStyle(
-                                                Color("WandrPrimary")
-                                            )
-                                            .lineLimit(2)
-
-                                            Text(
-                                                "Sponsored by \(sponsoredQuest.sponsorName)"
-                                            )
-                                            .font(.caption)
-                                            .foregroundStyle(
-                                                Color("WandrSecondary")
-                                            )
-
-                                            HStack(spacing: 5) {
-                                                Image(
-                                                    systemName: "clock"
+                                            ZStack {
+                                                RoundedRectangle(
+                                                    cornerRadius: 14
                                                 )
+                                                .fill(
+                                                    Color("WandrSecondary")
+                                                )
+
+                                                Image(
+                                                    systemName: "music.note"
+                                                )
+                                                .font(.title2)
+                                                .foregroundStyle(.white)
+                                            }
+                                            .frame(
+                                                width: 64,
+                                                height: 64
+                                            )
+
+                                            VStack(
+                                                alignment: .leading,
+                                                spacing: 5
+                                            ) {
 
                                                 Text(
-                                                    "\(sponsoredQuest.duration) min"
+                                                    sponsoredQuest.title
+                                                )
+                                                .font(.subheadline)
+                                                .fontWeight(.semibold)
+                                                .foregroundStyle(
+                                                    Color("WandrPrimary")
+                                                )
+                                                .lineLimit(2)
+
+                                                Text(
+                                                    "Sponsored by \(sponsoredQuest.sponsorName)"
+                                                )
+                                                .font(.caption)
+                                                .foregroundStyle(
+                                                    Color("WandrSecondary")
                                                 )
 
-                                                Spacer()
+                                                HStack(spacing: 5) {
 
-                                                Image(
-                                                    systemName:
-                                                        "chevron.right"
-                                                )
+                                                    Image(
+                                                        systemName: "clock"
+                                                    )
+
+                                                    Text(
+                                                        "\(sponsoredQuest.duration) min"
+                                                    )
+
+                                                    Spacer()
+
+                                                    Image(
+                                                        systemName: "chevron.right"
+                                                    )
+                                                }
+                                                .font(.caption2)
+                                                .foregroundStyle(.secondary)
                                             }
-                                            .font(.caption2)
-                                            .foregroundStyle(.secondary)
                                         }
-                                    }
-                                    .padding(12)
-                                    .background(Color.white)
-                                    .clipShape(
-                                        RoundedRectangle(
-                                            cornerRadius: 18
+                                        .padding(12)
+                                        .background(Color.white)
+                                        .clipShape(
+                                            RoundedRectangle(
+                                                cornerRadius: 18
+                                            )
                                         )
-                                    )
-                                }
-                                .buttonStyle(.plain)
+                                    }
+                                    .buttonStyle(.plain)
 
-                                Text(
-                                    "Recommended because you completed \(user.completedQuests) quests this month."
-                                )
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                                    Text(
+                                        "Recommended because you completed \(user.completedQuests) quests this month."
+                                    )
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                }
                             }
                         }
 
@@ -221,7 +216,7 @@ struct SponsoredQuestView: View {
         .task {
             await viewModel.loadCurrentUser()
         }
-        .onChange(of: connectivity.isConnected) { _, connected in
+        .onChange(of: networkMonitor.isConnected) { _, connected in
             if connected {
                 Task {
                     await viewModel.loadCurrentUser()

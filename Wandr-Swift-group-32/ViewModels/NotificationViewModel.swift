@@ -75,4 +75,38 @@ final class NotificationViewModel: ObservableObject {
         isLoading = false
     }
     
+    func refreshNotifications() async {
+
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            let loadedNotifications =
+                try await repository.fetchNotifications()
+
+            notifications = loadedNotifications
+
+            try await repository.markAllAsRead()
+
+            notifications = loadedNotifications.map { notification in
+                AppNotification(
+                    id: notification.id,
+                    type: notification.type,
+                    content: notification.content,
+                    readStatus: true,
+                    createdAt: notification.createdAt
+                )
+            }
+
+            try await localStorage.save(notifications)
+
+            print("Notifications refreshed from Supabase")
+
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+
+        isLoading = false
+    }
+    
 }

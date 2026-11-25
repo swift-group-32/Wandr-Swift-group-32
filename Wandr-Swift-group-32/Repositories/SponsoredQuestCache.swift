@@ -11,52 +11,92 @@ final class SponsoredQuestCache {
 
     static let shared = SponsoredQuestCache()
 
-    private let cache = NSCache<NSString, CachedActiveUser>()
+    private let cache =
+        NSCache<NSString, CachedSponsoredQuest>()
 
     private init() {
-        cache.countLimit = 10
+        cache.countLimit = 20
     }
 
     func save(_ user: ActiveUser) {
-        let cachedUser = CachedActiveUser(user: user)
+
+        let cachedUser = CachedSponsoredQuest(
+            user: user
+        )
 
         cache.setObject(
             cachedUser,
-            forKey: user.userId as NSString
+            forKey: "user-\(user.userId)" as NSString
         )
 
-        print("BQ13 result saved in NSCache")
+        for sponsoredQuest in user.sponsoredQuests {
+
+            let cachedQuest = CachedSponsoredQuest(
+                quest: sponsoredQuest
+            )
+
+            cache.setObject(
+                cachedQuest,
+                forKey: "quest-\(sponsoredQuest.id.uuidString)" as NSString
+            )
+        }
+
+        print("BQ13 data saved in NSCache")
     }
 
-    func load(userId: String) -> ActiveUser? {
+    func loadUser(userId: String) -> ActiveUser? {
 
-        guard let cachedUser = cache.object(
-            forKey: userId as NSString
-        ) else {
-            print("BQ13 result not found in NSCache")
+        guard let cachedObject =
+                cache.object(
+                    forKey: "user-\(userId)" as NSString
+                )
+        else {
             return nil
         }
 
-        print("BQ13 result loaded from NSCache")
-        return cachedUser.user
+        return cachedObject.user
+    }
+
+    func loadSponsoredQuest(
+        questId: UUID
+    ) -> SponsoredQuest? {
+
+        guard let cachedObject =
+                cache.object(
+                    forKey: "quest-\(questId.uuidString)" as NSString
+                )
+        else {
+            return nil
+        }
+
+        return cachedObject.quest
     }
 
     func remove(userId: String) {
+
         cache.removeObject(
-            forKey: userId as NSString
+            forKey: "user-\(userId)" as NSString
         )
     }
 
     func clear() {
+
         cache.removeAllObjects()
     }
 }
 
-private final class CachedActiveUser {
+private final class CachedSponsoredQuest {
 
-    let user: ActiveUser
+    let user: ActiveUser?
+    let quest: SponsoredQuest?
 
     init(user: ActiveUser) {
         self.user = user
+        self.quest = nil
+    }
+
+    init(quest: SponsoredQuest) {
+        self.user = nil
+        self.quest = quest
     }
 }
