@@ -30,7 +30,6 @@ struct ProfileView: View {
                 } else if let error = viewModel.errorMessage {
 
                     VStack(spacing: 12) {
-
                         Text(error)
 
                         Button("Retry") {
@@ -39,8 +38,37 @@ struct ProfileView: View {
                             }
                         }
 
-                    }
+                        NavigationLink {
+                            SponsoredQuestView()
+                        } label: {
+                            HStack {
+                                Image(systemName: "megaphone.fill")
+                                    .foregroundStyle(Color.wandrGreen)
 
+                                VStack(
+                                    alignment: .leading,
+                                    spacing: 4
+                                ) {
+                                    Text("Sponsored Quest Opportunities")
+                                        .font(.headline)
+
+                                    Text("Find users for sponsored quests")
+                                        .font(.caption)
+                                        .foregroundStyle(.gray)
+                                }
+
+                                Spacer()
+
+                                Image(systemName: "chevron.right")
+                                    .foregroundStyle(.gray)
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.white)
+                            .cornerRadius(16)
+                        }
+                    }
+                    .padding()
                 } else if let profile = viewModel.profile {
 
                     content(profile)

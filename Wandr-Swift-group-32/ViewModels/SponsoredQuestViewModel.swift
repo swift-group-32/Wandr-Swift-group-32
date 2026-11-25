@@ -55,6 +55,10 @@ final class SponsoredQuestViewModel: ObservableObject {
 
         } catch {
             
+            print("BQ13 ERROR:", error)
+            print("BQ13 ERROR DETAILS:", String(describing: error))
+
+            
             if activeUser == nil {
                 errorMessage = error.localizedDescription
             }
