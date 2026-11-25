@@ -31,6 +31,8 @@ struct HomeView: View {
     @State private var nearbyIsLoading = true
 
     @State private var nearbyErrorMessage: String?
+    
+    @StateObject private var networkMonitor = NetworkMonitor.shared
 
 
 
@@ -1577,6 +1579,19 @@ struct HomeView: View {
 
             }
 
+        }
+        
+        .onChange(of: networkMonitor.isConnected) { _, connected in
+            if connected {
+                Task {
+                    if let user = SupabaseManager.shared.client.auth.currentUser {
+                        await discoveryViewModel.loadRecommendations(
+                            userId: user.id.uuidString,
+                            savedQuestIds: savedQuestIds
+                        )
+                    }
+                }
+            }
         }
 
     }

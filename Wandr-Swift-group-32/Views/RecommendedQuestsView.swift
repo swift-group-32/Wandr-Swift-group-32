@@ -19,9 +19,23 @@ struct RecommendedQuestsView: View {
     
     @State private var selectedQuest: Quest?
     
+    @StateObject private var networkMonitor = NetworkMonitor.shared
+    
     var body: some View {
         
         VStack(spacing: 0) {
+            
+            if !networkMonitor.isConnected {
+                HStack(spacing: 8) {
+                    Image(systemName: "wifi.slash")
+
+                    Text("You're offline. Showing saved recommendations.")
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 8)
+            }
             
             ScrollView {
                 

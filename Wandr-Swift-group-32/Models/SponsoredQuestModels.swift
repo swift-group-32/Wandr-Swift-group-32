@@ -12,7 +12,7 @@ struct ActiveUser: Codable  {
     let name: String
     let completedQuests: Int
     let hasTriedSponsoredQuest: Bool
-    let sponsoredQuest: SponsoredQuest?
+    let sponsoredQuests: [SponsoredQuest]
 }
 
 struct SponsoredQuest: Codable {
