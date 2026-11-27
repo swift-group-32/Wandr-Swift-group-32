@@ -241,7 +241,10 @@ struct SponsoredQuestView: View {
             ExploreQuestDetailsView(
                 quest: quest,
                 isSaved: false,
-                onSave: { _, _ in }
+                onSave: { _, _ in },
+                onAccept: {
+                    selectedQuest = nil
+                }
             )
         }
     }

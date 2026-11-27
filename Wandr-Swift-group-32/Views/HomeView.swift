@@ -1517,6 +1517,9 @@ struct HomeView: View {
                     } else {
                         savedQuestIds.remove(quest.id)
                     }
+                },
+                onAccept: {
+                    selectedTab = .quest
                 }
             )
         }

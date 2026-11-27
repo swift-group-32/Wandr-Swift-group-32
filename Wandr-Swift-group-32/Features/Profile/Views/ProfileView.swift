@@ -82,14 +82,21 @@ struct ProfileView: View {
             .background(Color.wandrCream)
             .navigationTitle("Profile")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+
                     NavigationLink {
                         BusinessInsightsView()
                     } label: {
-                        Label("Business Insights", systemImage: "briefcase")
-                            .labelStyle(.titleAndIcon)
+                        Image(systemName: "briefcase")
                     }
                     .accessibilityIdentifier("businessInsightsLink")
+
+                    NavigationLink {
+                        DeveloperAccessView()
+                    } label: {
+                        Image(systemName: "person.badge.key.fill")
+                    }
+                    .accessibilityIdentifier("developerAccessLink")
                 }
             }
             .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhoto, matching: .images)

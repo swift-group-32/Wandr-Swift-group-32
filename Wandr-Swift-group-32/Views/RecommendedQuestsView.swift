@@ -28,7 +28,7 @@ struct RecommendedQuestsView: View {
             if !networkMonitor.isConnected {
                 HStack(spacing: 8) {
                     Image(systemName: "wifi.slash")
-
+                    
                     Text("You're offline. Showing saved recommendations.")
                 }
                 .font(.caption)
@@ -408,6 +408,9 @@ struct RecommendedQuestsView: View {
                         } else {
                             savedQuestIds.remove(quest.id)
                         }
+                    },
+                    onAccept: {
+                        selectedTab = .quest
                     }
                 )
             }
