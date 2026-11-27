@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-// The 3 screens of the auth flow
+
 enum AuthScreen {
     case login
     case signUp
@@ -174,6 +174,9 @@ class AuthViewModel: ObservableObject {
         }
         do { try BusinessInsightsStorage.shared.clearAll() }
         catch { print("Could not clear business reports:", error) }
+        
+        PhotoJournalStorage.shared.clearAll()
+        await ImagePipeline.shared.removeAll()
         name = ""
         password = ""
         confirmPassword = ""

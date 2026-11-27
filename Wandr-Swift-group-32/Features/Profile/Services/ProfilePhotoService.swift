@@ -30,7 +30,7 @@ class ProfilePhotoService {
         let path = "\(userId)/avatar.jpg"
 
 
-        let jpeg = UIImage(data: imageData)?.jpegData(compressionQuality: 0.6) ?? imageData
+        let jpeg = await ImageDownsampler.compressForUpload(imageData, maxPixelSize: 800, quality: 0.6)
 
         try await supabase.storage
             .from("avatars")
