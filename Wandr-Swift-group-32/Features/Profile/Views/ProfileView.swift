@@ -142,6 +142,9 @@ struct ProfileView: View {
                 trendCard(profile)
                 achievementsSection(profile)
 
+                
+                photoJournalLink()
+
                 NavigationLink {
                     SponsoredQuestView()
                 } label: {
@@ -190,7 +193,7 @@ struct ProfileView: View {
                     .frame(width: 72, height: 72)
                     .clipShape(Circle())
                     .overlay {
-                        // While the photo uploads, a spinner covers the avatar
+                        
                         if viewModel.isUploadingPhoto {
                             Circle().fill(Color.black.opacity(0.35))
                             ProgressView().tint(.white)
@@ -240,18 +243,15 @@ struct ProfileView: View {
         .cardStyle()
     }
 
-    // The user's photo if they have one if not, their bear avatar
+    
     @ViewBuilder
     func avatarImage() -> some View {
         if let url = viewModel.photoURL {
-            AsyncImage(url: url) { phase in
-                if let image = phase.image {
-                    image.resizable().scaledToFill()
-                } else if phase.error != nil {
-                    defaultAvatar()
-                } else {
-                    ProgressView()
-                }
+
+            CachedRemoteImage(key: url.absoluteString, url: url, maxPixelSize: 300) {
+                ProgressView()
+            } failure: {
+                defaultAvatar()
             }
         } else {
             defaultAvatar()
@@ -264,7 +264,7 @@ struct ProfileView: View {
             .scaledToFill()
     }
 
-    // 1. Next milestone: progress to the next level
+    
     func levelCard() -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
@@ -452,7 +452,35 @@ struct ProfileView: View {
         .cornerRadius(16)
     }
 
-    // BQ9
+    
+    func photoJournalLink() -> some View {
+        NavigationLink {
+            PhotoJournalView()
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "camera.on.rectangle")
+                    .foregroundColor(.wandrGreen)
+                    .frame(width: 40, height: 40)
+                    .background(Color.wandrSage.opacity(0.15))
+                    .clipShape(Circle())
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Photo journal")
+                        .font(.subheadline).bold()
+                        .foregroundColor(.wandrGreen)
+                    Text("Your quest proofs and most documented categories")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.gray)
+            }
+            .cardStyle()
+        }
+        .buttonStyle(.plain)
+    }
+
+    
     func insightsLink() -> some View {
         NavigationLink {
             ActivityInsightsView()

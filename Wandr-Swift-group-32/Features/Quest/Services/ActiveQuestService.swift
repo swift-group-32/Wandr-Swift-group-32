@@ -19,18 +19,27 @@ class ActiveQuestService: ActiveQuestServing {
     // false = calls Supabase
     let useMockData = false
 
+    
+    private static let decoder: JSONDecoder = {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return decoder
+    }()
+
     func fetchStartableQuests() async throws -> [StartableQuestDTO] {
         try await requireSession()
         let userId = try await supabase.auth.session.user.id
-        let catalog = try await supabase.from("quests")
+        
+        async let catalogRequest = supabase.from("quests")
             .select("id, title, estimated_duration, place:places(name)")
             .order("title", ascending: true).execute()
-        let completions = try await supabase.from("quest_completions")
+        async let completionsRequest = supabase.from("quest_completions")
             .select("quest_id").eq("user_id", value: userId)
             .eq("status", value: "completed").execute()
+        let (catalog, completions) = try await (catalogRequest, completionsRequest)
+
         struct Completion: Decodable { let questId: String }
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        let decoder = Self.decoder
         let completed = Set(try decoder.decode([Completion].self, from: completions.data).map(\.questId))
         return try decoder.decode([StartableQuestDTO].self, from: catalog.data)
             .filter { !completed.contains($0.id) }
@@ -67,9 +76,7 @@ class ActiveQuestService: ActiveQuestServing {
             .limit(1)
             .execute()
 
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        let results = try decoder.decode([ActiveQuestDTO].self, from: response.data)
+        let results = try Self.decoder.decode([ActiveQuestDTO].self, from: response.data)
 
         return results.first
     }
@@ -87,9 +94,7 @@ class ActiveQuestService: ActiveQuestServing {
             ])
             .execute()
 
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        return try decoder.decode(ObjectiveResult.self, from: response.data)
+        return try Self.decoder.decode(ObjectiveResult.self, from: response.data)
     }
 
 
@@ -100,7 +105,7 @@ class ActiveQuestService: ActiveQuestServing {
 
         let path = "\(userId.uuidString.lowercased())/\(questId)/\(objectiveId).jpg"
 
-        let jpeg = UIImage(data: imageData)?.jpegData(compressionQuality: 0.7) ?? imageData
+        let jpeg = await ImageDownsampler.compressForUpload(imageData, maxPixelSize: 1600, quality: 0.7)
 
         try await supabase.storage
             .from("quest-photos")

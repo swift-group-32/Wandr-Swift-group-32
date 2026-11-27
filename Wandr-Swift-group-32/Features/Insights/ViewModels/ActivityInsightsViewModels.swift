@@ -19,7 +19,6 @@ class ActivityInsightsViewModel: ObservableObject {
             .sink { [weak self] connected in
                 guard let self = self else { return }
                 if connected {
-                    // Internet is back: load new data
                     Task { await self.loadFromNetwork() }
                 } else {
                     self.isLoading = false

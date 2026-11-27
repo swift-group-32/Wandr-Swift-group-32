@@ -5,8 +5,11 @@ import CoreLocation
 @MainActor
 class ProfileViewModel: ObservableObject {
 
-    //Streak view
-    @Published var profile: StreakDTO? = nil
+    
+    @Published var profile: StreakDTO? = nil {
+        
+        didSet { latestBadge = Self.findLatestBadge(in: profile?.achievements ?? []) }
+    }
     @Published var isLoading = false
     @Published var errorMessage: String? = nil
 
@@ -98,7 +101,7 @@ class ProfileViewModel: ObservableObject {
         return achievement.description ?? "Keep exploring to unlock it"
     }
     
-    // Profile photo
+    
     @Published var user: UserProfileDTO? = nil
     @Published var isUploadingPhoto = false
     @Published var photoError: String? = nil
@@ -151,27 +154,37 @@ class ProfileViewModel: ObservableObject {
         return "Avatar\(total % 3 + 1)"
     }
     
-    // Lastest badge
-    var latestBadge: Achievement? {
-        let unlocked = profile?.achievements.filter { $0.unlocked } ?? []
-        return unlocked.max { earnedDate($0) < earnedDate($1) }
-    }
+    
+    @Published private(set) var latestBadge: Achievement? = nil
 
-
-    private func earnedDate(_ achievement: Achievement) -> Date {
+    private static let badgeDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "MMM dd"
+        return formatter
+    }()
 
+    static func findLatestBadge(in achievements: [Achievement], now: Date = Date()) -> Achievement? {
+        var best: (achievement: Achievement, date: Date)? = nil
+        for achievement in achievements where achievement.unlocked {
+            let date = earnedDate(achievement, now: now)
+            if best == nil || date > best!.date {
+                best = (achievement, date)
+            }
+        }
+        return best?.achievement
+    }
+
+    static func earnedDate(_ achievement: Achievement, now: Date = Date()) -> Date {
         guard let text = achievement.earnedOn,
-              let parsed = formatter.date(from: text) else { return .distantPast }
+              let parsed = badgeDateFormatter.date(from: text) else { return .distantPast }
 
         let calendar = Calendar.current
         var parts = calendar.dateComponents([.month, .day], from: parsed)
-        parts.year = calendar.component(.year, from: Date())
+        parts.year = calendar.component(.year, from: now)
 
         guard var date = calendar.date(from: parts) else { return .distantPast }
-        if date > Date() {
+        if date > now {
             date = calendar.date(byAdding: .year, value: -1, to: date) ?? date
         }
         return date
