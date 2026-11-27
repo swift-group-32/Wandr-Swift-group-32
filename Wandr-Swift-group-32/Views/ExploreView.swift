@@ -695,6 +695,9 @@ struct ExploreView: View {
                     } else {
                         savedQuestIds.remove(quest.id)
                     }
+                },
+                onAccept: {
+                    selectedTab = .quest
                 }
             )
         }
@@ -1089,18 +1092,27 @@ struct ExploreQuestDetailsView: View {
     let quest: Quest
     let isSaved: Bool
     let onSave: (Quest, Bool) -> Void
+    let onAccept: () -> Void
 
     @Environment(\.dismiss) private var dismiss
+
     @State private var saved: Bool
+    @State private var isStarting = false
+    @State private var startError: String?
+
+    private let activeQuestService = ActiveQuestService()
 
     init(
         quest: Quest,
         isSaved: Bool,
-        onSave: @escaping (Quest, Bool) -> Void
+        onSave: @escaping (Quest, Bool) -> Void,
+        onAccept: @escaping () -> Void
     ) {
         self.quest = quest
         self.isSaved = isSaved
         self.onSave = onSave
+        self.onAccept = onAccept
+
         _saved = State(initialValue: isSaved)
     }
 
@@ -1174,18 +1186,14 @@ struct ExploreQuestDetailsView: View {
                     Text(quest.category.uppercased())
                         .font(.caption)
                         .fontWeight(.semibold)
-                        .foregroundStyle(
-                            Color("WandrSecondary")
-                        )
+                        .foregroundStyle(Color("WandrSecondary"))
 
                     // MARK: Title
 
                     Text(quest.title)
                         .font(.title)
                         .fontWeight(.bold)
-                        .foregroundStyle(
-                            Color("WandrPrimary")
-                        )
+                        .foregroundStyle(Color("WandrPrimary"))
 
                     // MARK: Description
 
@@ -1199,9 +1207,7 @@ struct ExploreQuestDetailsView: View {
 
                     HStack(spacing: 12) {
                         Image(systemName: "clock.fill")
-                            .foregroundStyle(
-                                Color("WandrSecondary")
-                            )
+                            .foregroundStyle(Color("WandrSecondary"))
 
                         VStack(
                             alignment: .leading,
@@ -1223,9 +1229,7 @@ struct ExploreQuestDetailsView: View {
 
                     HStack(spacing: 12) {
                         Image(systemName: "star.fill")
-                            .foregroundStyle(
-                                Color("WandrSecondary")
-                            )
+                            .foregroundStyle(Color("WandrSecondary"))
 
                         VStack(
                             alignment: .leading,
@@ -1254,9 +1258,7 @@ struct ExploreQuestDetailsView: View {
 
                     Text("Quest objectives")
                         .font(.headline)
-                        .foregroundStyle(
-                            Color("WandrPrimary")
-                        )
+                        .foregroundStyle(Color("WandrPrimary"))
 
                     objectiveRow(
                         icon: "figure.walk",
@@ -1283,38 +1285,70 @@ struct ExploreQuestDetailsView: View {
 
                         Text("+50 XP")
                             .fontWeight(.semibold)
-                            .foregroundStyle(
-                                Color("WandrSecondary")
-                            )
+                            .foregroundStyle(Color("WandrSecondary"))
+                    }
+
+                    // MARK: Error
+
+                    if let startError {
+                        Text(startError)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                            .frame(maxWidth: .infinity)
                     }
 
                     // MARK: Accept
 
                     Button {
-                        // Quest acceptance can be connected later.
+                        Task {
+                            await aceptarQuest()
+                        }
                     } label: {
-                        Text("Accept Quest")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 15)
-                            .background(
-                                Color("WandrPrimary")
-                            )
-                            .clipShape(
-                                RoundedRectangle(
-                                    cornerRadius: 14
-                                )
-                            )
+                        if isStarting {
+                            ProgressView()
+                                .tint(.white)
+                                .frame(maxWidth: .infinity)
+                        } else {
+                            Text("Accept Quest")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                        }
                     }
+                    .padding(.vertical, 15)
+                    .background(Color("WandrPrimary"))
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: 14)
+                    )
+                    .disabled(isStarting)
                 }
                 .padding(20)
             }
         }
-        .background(
-            Color("WandrBackground")
-        )
+        .background(Color("WandrBackground"))
+    }
+
+    private func aceptarQuest() async {
+        guard !isStarting else { return }
+
+        isStarting = true
+        startError = nil
+
+        do {
+            try await activeQuestService.startQuest(
+                questId: quest.id
+            )
+
+            dismiss()
+            onAccept()
+
+        } catch {
+            print("Could not start quest:", error)
+
+            startError = "Could not start this quest. Please try again."
+            isStarting = false
+        }
     }
 
     private func objectiveRow(
@@ -1323,9 +1357,7 @@ struct ExploreQuestDetailsView: View {
     ) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .foregroundStyle(
-                    Color("WandrSecondary")
-                )
+                .foregroundStyle(Color("WandrSecondary"))
                 .frame(width: 24)
 
             Text(text)
@@ -1341,25 +1373,19 @@ struct ExploreQuestDetailsView: View {
         switch category.lowercased() {
         case "outdoor":
             return "figure.hiking"
-
         case "food":
             return "fork.knife"
-
         case "culture":
             return "paintpalette"
-
         case "music":
             return "music.note"
-
         case "games":
             return "gamecontroller"
-
         default:
             return "sparkles"
         }
     }
 }
-
 // MARK: - Event Details
 
 struct ExploreEventDetailsView: View {
