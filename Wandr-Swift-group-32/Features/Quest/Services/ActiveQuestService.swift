@@ -1,6 +1,7 @@
 import Foundation
 import Supabase
 import UIKit
+import os
 
 @MainActor
 protocol ActiveQuestServing {
@@ -18,6 +19,11 @@ class ActiveQuestService: ActiveQuestServing {
     // true  = mock data
     // false = calls Supabase
     let useMockData = false
+
+    /// MO1 measurement switch. true = Sprint 3 code, only to take the "before" numbers.
+    static var measureLegacyCompression = false
+    
+    private static let signposter = OSSignposter(subsystem: "Wandr", category: .pointsOfInterest)
 
     
     private static let decoder: JSONDecoder = {
@@ -105,7 +111,23 @@ class ActiveQuestService: ActiveQuestServing {
 
         let path = "\(userId.uuidString.lowercased())/\(questId)/\(objectiveId).jpg"
 
-        let jpeg = await ImageDownsampler.compressForUpload(imageData, maxPixelSize: 1600, quality: 0.7)
+
+        let signpostState = Self.signposter.beginInterval("Compress proof photo")
+        let start = ContinuousClock.now
+        let jpeg: Data
+        if Self.measureLegacyCompression {
+            jpeg = UIImage(data: imageData)?.jpegData(compressionQuality: 0.7) ?? imageData
+        } else {
+            jpeg = await ImageDownsampler.compressForUpload(imageData, maxPixelSize: 1600, quality: 0.7)
+        }
+        let elapsed = ContinuousClock.now - start
+        Self.signposter.endInterval("Compress proof photo", signpostState)
+        let ms = Int(elapsed.components.seconds * 1000) + Int(elapsed.components.attoseconds / 1_000_000_000_000_000)
+        print("""
+            [MO1] \(Self.measureLegacyCompression ? "BEFORE (main thread)" : "AFTER (background thread)") \
+            original: \(imageData.count / 1024) KB · processing: \(ms) ms · \
+            main thread blocked: \(Self.measureLegacyCompression ? ms : 0) ms · uploaded: \(jpeg.count / 1024) KB
+            """)
 
         try await supabase.storage
             .from("quest-photos")

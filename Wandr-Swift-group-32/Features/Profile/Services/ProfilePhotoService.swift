@@ -1,3 +1,5 @@
+
+
 import Foundation
 import Supabase
 import UIKit
@@ -30,7 +32,21 @@ class ProfilePhotoService {
         let path = "\(userId)/avatar.jpg"
 
 
-        let jpeg = await ImageDownsampler.compressForUpload(imageData, maxPixelSize: 800, quality: 0.6)
+        let legacy = ActiveQuestService.measureLegacyCompression
+        let start = ContinuousClock.now
+        let jpeg: Data
+        if legacy {
+            jpeg = UIImage(data: imageData)?.jpegData(compressionQuality: 0.6) ?? imageData
+        } else {
+            jpeg = await ImageDownsampler.compressForUpload(imageData, maxPixelSize: 800, quality: 0.6)
+        }
+        let elapsed = ContinuousClock.now - start
+        let ms = Int(elapsed.components.seconds * 1000) + Int(elapsed.components.attoseconds / 1_000_000_000_000_000)
+        print("""
+            [MO1 avatar] \(legacy ? "BEFORE (main thread)" : "AFTER (background thread)") \
+            original: \(imageData.count / 1024) KB · processing: \(ms) ms · \
+            main thread blocked: \(legacy ? ms : 0) ms · uploaded: \(jpeg.count / 1024) KB
+            """)
 
         try await supabase.storage
             .from("avatars")
