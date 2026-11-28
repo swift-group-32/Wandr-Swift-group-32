@@ -53,7 +53,7 @@ class AuthViewModel: ObservableObject {
         }
     }
 
-    // Only numbers, and at most 6
+    // Only numbers, and at most 8
     @Published var code = "" {
         didSet {
             let limited = String(code.filter { $0.isNumber }.prefix(AuthRules.codeLength))
@@ -130,13 +130,17 @@ class AuthViewModel: ObservableObject {
                 password: password
             )
             go(to: .verifyCode)
-            infoMessage = "We sent a 8 digit code to \(cleanEmail)."
+            infoMessage = "We sent an 8-digit code to \(cleanEmail)."
+        } catch SignUpError.emailAlreadyRegistered {
+            // The email already has an account: stay here and suggest logging in
+            errorMessage = "This email already has an account. Log in instead."
         } catch {
             errorMessage = friendlyMessage(for: error)
         }
         isWorking = false
     }
-
+    
+    
     func verifyCode() async {
         if code.count != AuthRules.codeLength {
             errorMessage = "Enter the 8 digit code from the email."
