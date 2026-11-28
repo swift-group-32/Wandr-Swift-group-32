@@ -78,18 +78,32 @@ nonisolated struct QuestStatistics: Codable, Equatable, Sendable {
             calendar.date(byAdding: .month, value: $0, to: currentMonth)
         }
 
-        let places = Set(completions.compactMap { $0.quest?.place?.id })
-        let categoryNames = completions.compactMap { completion -> String? in
-            guard let category = completion.quest?.place?.category?
-                .trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
-                !category.isEmpty else { return nil }
-            return category
+        var places: Set<String> = []
+        var categoryCounts: [String: Int] = [:]
+        var categorizedCount = 0
+        var activity: [TimeBand: Int] = [:]
+        var monthCounts: [Date: Int] = [:]
+
+        for completion in completions {
+            let place = completion.quest?.place
+            if let place {
+                places.insert(place.id)
+                if let category = place.category?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
+                   !category.isEmpty {
+                    categoryCounts[category, default: 0] += 1
+                    categorizedCount += 1
+                }
+            }
+
+            guard let date = completion.completedAt else { continue }
+            let band = TimeBand(hour: calendar.component(.hour, from: date))
+            activity[band, default: 0] += 1
+
+            if let oldestMonth = monthStarts.first, date >= oldestMonth, date <= now,
+               let month = calendar.dateInterval(of: .month, for: date)?.start {
+                monthCounts[month, default: 0] += 1
+            }
         }
-        let categoryCounts = Dictionary(grouping: categoryNames, by: { $0 }).mapValues(\.count)
-        let categorizedCount = categoryNames.count
-        let activity = Dictionary(grouping: completions.compactMap { row in
-            row.completedAt.map { TimeBand(hour: calendar.component(.hour, from: $0)) }
-        }, by: { $0 }).mapValues(\.count)
 
         let categories = categoryCounts.sorted {
             $0.value == $1.value ? $0.key < $1.key : $0.value > $1.value
@@ -104,13 +118,7 @@ nonisolated struct QuestStatistics: Codable, Equatable, Sendable {
             uniquePlaces: places.count,
             categories: categories,
             activity: activity,
-            months: monthStarts.map { month in
-                let count = completions.filter { completion in
-                    guard let date = completion.completedAt, date >= month, date <= now else { return false }
-                    return calendar.dateInterval(of: .month, for: date)?.start == month
-                }.count
-                return Month(start: month, count: count)
-            },
+            months: monthStarts.map { Month(start: $0, count: monthCounts[$0, default: 0]) },
             distanceKilometers: distance(for: completions)
         )
     }
