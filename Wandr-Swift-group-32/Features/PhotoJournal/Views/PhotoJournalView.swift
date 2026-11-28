@@ -1,12 +1,4 @@
-//
-//  PhotoJournalView.swift
-//  Wandr-Swift-group-32
-//
-//  Sprint 4 - Catalina Villacris
-//  New view: the user's photo journal. Answers the BQ
-//  "How many of my completed quests have photo proof, and which categories
-//  have I documented the most?"
-//
+
 
 import SwiftUI
 
@@ -55,7 +47,7 @@ struct PhotoJournalView: View {
         }
     }
 
-    // MARK: - Banner
+    
 
     func messageBanner(_ text: String) -> some View {
         HStack(alignment: .top, spacing: 8) {
@@ -70,7 +62,7 @@ struct PhotoJournalView: View {
         .cornerRadius(12)
     }
 
-    // MARK: - BQ answer, part 1: how many quests have proof
+
 
     func summaryCard(_ report: PhotoJournalReport) -> some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -109,7 +101,7 @@ struct PhotoJournalView: View {
         .cardStyle()
     }
 
-    // MARK: - BQ answer, part 2: most documented categories
+
 
     func categoriesCard(_ report: PhotoJournalReport) -> some View {
         let categories = viewModel.documentedCategories
@@ -155,7 +147,7 @@ struct PhotoJournalView: View {
         .cardStyle()
     }
 
-    // MARK: - Gallery
+
 
     @ViewBuilder
     func gallerySection(_ report: PhotoJournalReport) -> some View {
@@ -251,7 +243,6 @@ struct PhotoJournalView: View {
     }
 }
 
-// MARK: - Detail
 
 struct PhotoJournalDetailView: View {
     let photo: JournalPhoto
@@ -261,7 +252,33 @@ struct PhotoJournalDetailView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 16) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    photoCard()
+                    infoCard()
+                }
+                .padding()
+            }
+            .background(Color.wandrCream)
+            .navigationTitle("Quest proof")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                        .foregroundColor(.wandrGreen)
+                }
+            }
+            .task {
+                url = await viewModel.detailURL(for: photo)
+            }
+        }
+    }
+
+    func photoCard() -> some View {
+        Color.clear
+            .aspectRatio(0.8, contentMode: .fit)   // 4:5
+            .frame(maxWidth: .infinity)
+            .overlay {
                 CachedRemoteImage(
                     key: photo.fullKey,
                     url: url,
@@ -273,39 +290,65 @@ struct PhotoJournalDetailView: View {
                         ProgressView()
                     }
                 }
-                .frame(maxWidth: .infinity)
-                .frame(height: 380)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .overlay(alignment: .topLeading) {
+                Label("Photo proof", systemImage: "checkmark.seal.fill")
+                    .font(.caption).bold()
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Capsule())
+                    .padding(12)
+            }
+            .shadow(color: .black.opacity(0.08), radius: 10, y: 4)
+    }
 
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(photo.questTitle)
-                        .font(.title3).bold()
-                        .foregroundColor(.wandrGreen)
-                    if !photo.placeName.isEmpty {
-                        Label(photo.placeName, systemImage: "mappin.and.ellipse")
-                            .font(.subheadline)
-                    }
-                    Label(photo.category, systemImage: "square.grid.2x2")
-                        .font(.subheadline)
-                    if let date = photo.takenAt {
-                        Label(date.formatted(date: .long, time: .omitted), systemImage: "calendar")
-                            .font(.subheadline)
-                    }
-                }
-                .foregroundColor(.gray)
+    func infoCard() -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(photo.questTitle)
+                .font(.title3).bold()
+                .foregroundColor(.wandrGreen)
+                .fixedSize(horizontal: false, vertical: true)
 
-                Spacer()
+            Text(photo.category)
+                .font(.caption).bold()
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(Color.wandrSage.opacity(0.15))
+                .foregroundColor(.wandrGreen)
+                .clipShape(Capsule())
+
+            Divider()
+
+            if !photo.placeName.isEmpty {
+                infoRow(icon: "mappin.and.ellipse", title: "Place", value: photo.placeName)
             }
-            .padding()
-            .background(Color.wandrCream)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                }
+            if let date = photo.takenAt {
+                infoRow(icon: "calendar", title: "Completed",
+                        value: date.formatted(date: .long, time: .shortened))
             }
-            .task {
-                url = await viewModel.detailURL(for: photo)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardStyle()
+    }
+
+    func infoRow(icon: String, title: String, value: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .foregroundColor(.wandrGreen)
+                .frame(width: 32, height: 32)
+                .background(Color.wandrSage.opacity(0.15))
+                .clipShape(Circle())
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title.uppercased())
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+                Text(value)
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
             }
+            Spacer(minLength: 0)
         }
     }
 }

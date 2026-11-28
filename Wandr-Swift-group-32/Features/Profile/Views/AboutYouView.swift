@@ -40,7 +40,7 @@ struct AboutYouView: View {
             }
 
             Section("Notifications") {
-                // Sponsored quest notifications (BQ13) respect this option
+
                 Toggle("Receive notifications", isOn: $viewModel.notificationsEnabled)
                     .tint(.wandrGreen)
             }
