@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import Supabase
 
 class AboutYouViewModel: ObservableObject {
 
@@ -62,7 +63,8 @@ class AboutYouViewModel: ObservableObject {
             message = nil
             didSave = true
         } catch {
-            message = "Could not save your answers. Try again."
+            print("About you save error:", error)
+            message = "We couldn't save your answers right now. Your choices are still here, tap Save to try again."
         }
         isSaving = false
     }
