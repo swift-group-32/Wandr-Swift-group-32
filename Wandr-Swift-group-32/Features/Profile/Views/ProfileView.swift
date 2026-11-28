@@ -175,7 +175,6 @@ struct ProfileView: View {
                     .cornerRadius(16)
                 }
 
-                insightsLink()
 
                 logOutButton()
                 
@@ -481,32 +480,6 @@ struct ProfileView: View {
     }
 
     
-    func insightsLink() -> some View {
-        NavigationLink {
-            ActivityInsightsView()
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: "chart.bar.xaxis")
-                    .foregroundColor(.wandrGreen)
-                    .frame(width: 40, height: 40)
-                    .background(Color.wandrSage.opacity(0.15))
-                    .clipShape(Circle())
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Activity insights")
-                        .font(.subheadline).bold()
-                        .foregroundColor(.wandrGreen)
-                    Text("What inactive users have in common")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.gray)
-            }
-            .cardStyle()
-        }
-        .buttonStyle(.plain)
-    }
 
     func logOutButton() -> some View {
         Button {

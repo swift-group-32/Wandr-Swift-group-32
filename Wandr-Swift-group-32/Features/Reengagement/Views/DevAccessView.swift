@@ -51,7 +51,7 @@ struct DeveloperAccessView: View {
             .tint(Color.wandrGreen)
 
             NavigationLink(
-                destination: ReengagementView(),
+                destination: DeveloperDashboardView(),
                 isActive: $accesoConcedido
             ) {
                 EmptyView()
