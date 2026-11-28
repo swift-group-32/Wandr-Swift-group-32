@@ -25,7 +25,11 @@ struct ProfileView: View {
 
                 if viewModel.isLoading {
 
-                    ProgressView("Loading your streak...")
+                    VStack(spacing: 12) {
+                        ProgressView("Loading your streak...")
+                        statisticsLink()
+                    }
+                    .padding()
 
                 } else if let error = viewModel.errorMessage {
 
@@ -37,6 +41,8 @@ struct ProfileView: View {
                                 await viewModel.loadStreak(userId: userId)
                             }
                         }
+
+                        statisticsLink()
 
                         NavigationLink {
                             SponsoredQuestView()
@@ -75,7 +81,11 @@ struct ProfileView: View {
 
                 } else {
 
-                    Text("No activity yet. Complete your first quest!")
+                    VStack(spacing: 12) {
+                        Text("No activity yet. Complete your first quest!")
+                        statisticsLink()
+                    }
+                    .padding()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -143,6 +153,7 @@ struct ProfileView: View {
                 achievementsSection(profile)
 
                 
+                statisticsLink()
                 photoJournalLink()
 
                 NavigationLink {
@@ -453,6 +464,27 @@ struct ProfileView: View {
     }
 
     
+    func statisticsLink() -> some View {
+        NavigationLink {
+            QuestStatisticsView()
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "chart.bar.fill")
+                    .foregroundStyle(Color.wandrGreen)
+                    .frame(width: 40, height: 40)
+                    .background(Color.wandrSage.opacity(0.15), in: Circle())
+                Text("Mis estadísticas")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(Color.wandrGreen)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(.secondary)
+            }
+            .cardStyle()
+        }
+        .buttonStyle(.plain)
+    }
+
     func photoJournalLink() -> some View {
         NavigationLink {
             PhotoJournalView()

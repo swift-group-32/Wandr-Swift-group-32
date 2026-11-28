@@ -100,7 +100,9 @@ class ActiveQuestService: ActiveQuestServing {
             ])
             .execute()
 
-        return try Self.decoder.decode(ObjectiveResult.self, from: response.data)
+        let result = try Self.decoder.decode(ObjectiveResult.self, from: response.data)
+        if result.questCompleted { QuestStatisticsStore.shared.invalidate() }
+        return result
     }
 
 
@@ -142,5 +144,6 @@ class ActiveQuestService: ActiveQuestServing {
         try await supabase
             .rpc("abandon_quest", params: ["p_quest_id": questId])
             .execute()
+        QuestStatisticsStore.shared.invalidate()
     }
 }
