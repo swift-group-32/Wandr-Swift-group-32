@@ -287,6 +287,7 @@ struct ExploreView: View {
                             }
                         }
                     }
+                    .scrollClipDisabled()
                     .padding(.horizontal, 20)
                     .padding(.bottom, 28)
 
@@ -552,6 +553,7 @@ struct ExploreView: View {
                                     }
                                 }
                             }
+                            .scrollClipDisabled()
                         }
                     }
                     .padding(.horizontal, 20)
@@ -949,6 +951,11 @@ struct EventCard: View {
                 cornerRadius: 24
             )
         )
+        .shadow(
+            color: Color.black.opacity(0.06),
+            radius: 8,
+            y: 3
+        )
     }
 
     private var placeholderImage: some View {
@@ -1026,6 +1033,7 @@ struct QuestExploreCard: View {
                         Color("WandrPrimary")
                     )
                     .lineLimit(2)
+                    .frame(height: 36, alignment: .top)
 
                 HStack(spacing: 5) {
 
@@ -1044,7 +1052,7 @@ struct QuestExploreCard: View {
             }
             .padding(12)
         }
-        .frame(width: 190)
+        .frame(width: 190, height: 220)
         .background(Color.white)
         .clipShape(
             RoundedRectangle(

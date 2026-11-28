@@ -131,9 +131,8 @@ struct HomeView: View {
 
 
             case .mysteryQuest:
-                placeholderView(
-                    title: "Mystery Quest",
-                    icon: "sparkles"
+                MysteryQuestView(
+                    selectedTab: $selectedTab
                 )
                 
             case .quest:
@@ -563,18 +562,12 @@ struct HomeView: View {
 
                         ) {
 
-
-
                             HStack(spacing: 12) {
-
-
 
                                 ForEach(
                                     categories,
                                     id: \.1
                                 ) { category in
-
-
 
                                     Button {
 
@@ -584,11 +577,7 @@ struct HomeView: View {
 
                                     } label: {
 
-
-
                                         HStack(spacing: 8) {
-
-
 
                                             Image(
 
@@ -661,6 +650,7 @@ struct HomeView: View {
                             }
 
                         }
+                        .scrollClipDisabled()
 
                     }
 
@@ -1006,6 +996,7 @@ struct HomeView: View {
                                 }
 
                             }
+                            .scrollClipDisabled()
 
                         }
 
