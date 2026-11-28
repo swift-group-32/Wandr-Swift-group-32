@@ -23,7 +23,7 @@ struct VerifyCodeView: View {
                         .multilineTextAlignment(.center)
                 }
 
-                TextField("000000", text: $auth.code)
+                TextField("00000000", text: $auth.code)
                     .keyboardType(.numberPad)
                     .textContentType(.oneTimeCode)
                     .font(.system(size: 32, weight: .bold, design: .monospaced))

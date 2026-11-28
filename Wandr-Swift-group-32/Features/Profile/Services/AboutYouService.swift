@@ -19,12 +19,19 @@ class AboutYouService {
 
     func save(_ info: AboutYouDTO) async throws {
         try await requireSession()
-        let userId = try await supabase.auth.session.user.id
 
-        try await supabase
-            .from("users")
-            .update(info)
-            .eq("id", value: userId)
-            .execute()
+        let params = AboutYouParams(
+            p_age_range: info.age_range,
+            p_occupation: info.occupation,
+            p_notifications_enabled: info.notifications_enabled
+        )
+        try await supabase.rpc("update_about_you", params: params).execute()
     }
 }
+
+nonisolated struct AboutYouParams: Encodable {
+    let p_age_range: String?
+    let p_occupation: String?
+    let p_notifications_enabled: Bool?
+}
+

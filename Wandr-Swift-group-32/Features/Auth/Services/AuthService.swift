@@ -24,11 +24,15 @@ class AuthService {
     }
 
     func signUp(name: String, email: String, password: String) async throws {
-        try await supabase.auth.signUp(
+        let response = try await supabase.auth.signUp(
             email: email,
             password: password,
             data: ["name": .string(name), "full_name": .string(name)]
         )
+
+        if response.user.identities?.isEmpty == true {
+            throw SignUpError.emailAlreadyRegistered
+        }
     }
 
     func verifyCode(email: String, code: String) async throws {
@@ -41,6 +45,14 @@ class AuthService {
 
     func signOut() async throws {
         try await supabase.auth.signOut()
+    }
+}
+
+nonisolated enum SignUpError: LocalizedError {
+    case emailAlreadyRegistered
+
+    var errorDescription: String? {
+        "This email already has an account. Log in instead."
     }
 }
 
