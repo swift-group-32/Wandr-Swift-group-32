@@ -182,6 +182,9 @@ class AuthViewModel: ObservableObject {
         do { try QuestStatisticsStore.shared.clear() }
         catch { print("Could not clear quest statistics:", error) }
 
+        do { try LowUseCategoriesStore.shared.clear() }
+        catch { print("Could not clear low-use category reports:", error) }
+
         PhotoJournalStorage.shared.clearAll()
         await ImagePipeline.shared.removeAll()
         name = ""
